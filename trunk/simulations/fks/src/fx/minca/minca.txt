@@ -1,0 +1,76 @@
+Tu je moje riesenie mince:
+
+Najprv predpoklady - predpokladajme, ze
+1. ujo ma oci vo vodorovnej polohe (kvoli symetrii, dalo by sa to aj bez toho ale bolo by to mrte komplikovanejsie)
+2. ze vzdialenost predmetu urcujeme vyhradne uhlom, pod ktorym ho vidime
+
+ked sme si tieto veci ujasnili, dajme sa do toho-
+Pozrime sa na celu situaciu zhora - ked si nakreslime luce, ani si nevsimneme,
+ze vnikli do vody. Preco? No pretoze z tohoto pohladu neuvidime , ze sa lamu.
+A to preco? Lebo luc dopadu, lomu a normala na hladinu v mieste dopadu lezia v jednej rovine (nazvime ju ro)
+lenze ako vieme, normala na hladinu je v nasom pripade kolma na nas pohlad a => cela rovina luca
+je kolma na nas pohlad => vidime ju ako ciaru.
+Teraz sme vystrojeny dolezitym faktom, a to, ze x-ova suradnica 
+priesecniku lucov z oka (podla zakonu spetneho chodu lucov sa na totu ulohu mozeme pozerat
+na "ziaraciace oci, ktorych luce sa pretnu v 1 bode" ) je taka ista bez ohladu, ci sa to lame alebo nie.
+Ak si oznacime uhol, ktory zviera luc s normalou hladiny alpha a beta uhol, ktory zviera odrazeny luc,
+tak tieto priestorove uhly budu rovnake ako uhly planarne, ked si dame priemetnu rovinu ro.
+
+Pozorovanie - bez ohladu na to, ci berieme do uvahy lom alebo nie (resp., bez ohladu na index
+lomu vody) sa nas luc pretne s lucom od druheho oka na tej istej x-ovej suradnici v tejto rovine!
+(to vyplyva z pohladu zhora).
+
+Preto si mozeme situaciu takto nakreslit:
+(pozor - treba mat pismo s fixnutou sirkou)
+
+..     |
+  ..alp|
+    .. |A       B
+-------|--------|-------------
+        ..      | <- nasa x pretnutia  
+        , ..    |
+         ,  ..  |
+         ,    ..|C  <- povodny luc, hlbku oznacime h
+          ,  <- lomeny luc
+          ,
+           ,
+            , <- zaoblenie je narocky, nechcelo sa mi robit mrt riadkov
+       vvvvv ,
+        beta  , | <- hlbku oznacime H
+               ,| D
+
+
+
+Ak oznacime |AB| = x, potom
+plati Tan(90-alpha)=h/x
+      Tan(90-beta )=H/x
+
+Potom, skutocna hlbka je h=H*Tan(90-alpha)/Tan(90-beta)
+
+Pritom plati zakon lomu, teda Sin(alpha)/Sin(beta)=n;
+
+Teda beta=ArcSin(Sin(alpha)/n);
+Pritom Tan(90-arcsin(alpha)/n)=Cotan(acrsin[sin(alpha)/n])= (je to taky trigonometricky vzorcek)
+Sqrt[1-(sin(alpha)/n)^2]/(sin(alpha)/n)
+
+Nakoniec dostavame
+h=H*Cotan(alpha) Sin[alpha] / n Sqrt[(1-Sin(alpha)^2/n^2)]
+Pritom cotan*sin=cos
+
+Teda h=H*cos(alpha)/ Sqrt[n^2-Sin(alpha)^2]
+
+Toto je uz finalny vzorec, co som dostal, dalej som to zjednodusit nevedel.
+
+Priblizne hodnoty pre rozne uhly
+n=1.33
+alpha=
+0	0.75188
+10	0.74685
+20	0.731124
+30	0.702694
+40	0.657913
+50	0.591214
+60	0.495341
+70	0.363383
+80	0.194259
+90	0
