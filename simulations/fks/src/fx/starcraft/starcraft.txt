@@ -1,0 +1,117 @@
+Najprv si rozoberme, co je idealna strategia.
+Zjavne je idealne
+1. nebranit sa, ale vzdy strielat
+(zoberme to teoreticky takto - predstavme si, ze sa chceme jednotko branit,
+co tak ak by sme si to odlozili na neskor a trochu teraz pomohli nasim jednotkam?
+Nase jednotky dostanu dokopy vecsiu palebnu silu a superove budu mat rovnaku =>
+zvysime straty na zivotoch u supera, co zmensi jeho palebnu silu a takto sa to lavinovo 
+spusta - preto ak sa chceme nejakym hracom branit pocas jeho zivota k minut, je to idealne,
+aby sa branil az tesne pred smrtou - ale to sa uz vlastne branit ani nemusi - zomre tak ci tak,
+alebo bude cely cas necinny a bude figurovat len ako fiktivny bojovnik)
+2. vsetci budu strielat po tom istom protivnikovi - toto je jasne - ak chceme minimalizovat
+ nase straty, musime minimalizovat integral palebnej sily nepriatela a preto ze vzdy 
+ lepsie zabit najpr 1 cloveka a potom 2. ako oboch naraz za dvojnasobny cas (a takto
+to funguje aj s mrtou ludi)
+Teda strategia pre hracov je jasna, vsetci palia na ten isty ciel a nekryju sa
+
+Predstavem si, ze nase armady su nechutne velke (tak radovo mrt^mrt ludi).
+Potom straty na zivotoch budu taketo
+majme pocty x(t), y(t) hracov.
+Potom za cas dt budu straty dx,dy
+Plati dx=-y/a dt (pretoze za jednotkovy cas ma super celkovu palebnu silu y a na 1. treba vystrelit a krat.
+      dy=-x/a dt
+
+A mame tu sustavu diferencialnych rovniciek
+
+x'(t)=-y(t)/a;
+y'(t)=-x(t)/a;
+x(0)=X;
+y(0)=Y;
+
+Chceli by sme vediet priebeh hry, teda funkcie x(t),y(t);
+Z prvych dvoch rovnic si vyjadrime x'' pomocou x a y'' pomocou y:
+Plati x''(t)=x(t)/a^2
+      y''(t)=y(t)/a^2
+
+Potrebujeme funkciu, ktorej druha derivacia je tato funkcia krat konstanta.
+Na vyber mame tieto funkcie: sin,cos,sinh,cosh,exp.
+Pretoze ostatne sa daju vyjadrit pomocou exponencialnej, uprednostnime ju:
+
+x(t)=c1*e^(t/a)+c2*e^(-t/a)
+x'(t)=c1*e^(t/a)/a+c2*e^(-t/a)/(-a)
+x''(t)=c1*e^(t/a)/a/a+c2*e^(-t/a)/(-a)/(-a)
+x''(t)=1/a^2*x(t)
+
+Takze majme 
+x(t)=c1*e^(t/a)+c2*e^(-t/a)
+y(t)=c3*e^(t/a)+c4*e^(-t/a)
+
+x'(t)=c1*e^(t/a)/a-c2*e^(-t/a)/a == -y(t)/a = -c3*e^(t/a)/a-c4*e^(-t/a)
+Z tejto rovnice dostavame
+c1/a==-c3/a   => c3=-c1
+-c2/a==-c4/a  => c4=c2
+
+Potom
+y'(t)= c3*e^(t/a)/a+c4*e^(-t/a)/(-a)==
+  == -c1*e^(t/a)/a-c2*e^(-t/a)/a == -x(t)/a 
+co sedi.
+
+
+Zo zaciatocnych podmienok plati
+X=x(0)
+Y=y(0)
+
+X=c1*e^0+c2*e^0
+Y=-c1*e^0+c2*e^0
+
+X=c1+c2
+Y=-c1+c2
+----------
+c2=(X+Y)/2
+c1=(X-Y)/2
+
+
+cim dostavame
+
+x(t)=(X-Y)/2*e^(t/a) + (X+Y)/2*e^(-t/a)
+y(t)=-(X-Y)/2*e^(t/a) + (X+Y)/2*e^(-t/a)
+
+
+x(t)=X*1/2(e^(t/a)+e^(-t/a)) - Y*1/2(e^(t/a)-e^(-t/a))
+y(t)=-X*1/2(e^(t/a)-e^(-t/a)) + Y*1/2(e^(t/a)+e^(-t/a))
+
+x(t)=X*cosh(t/a)-Y*sinh(t/a)
+y(t)=-X*sinh(t/a)+Y*cosh(t/a)
+
+Co sme mohli tipnut aj skor a nemuseli sme sa prplat s exp.
+
+Toto je teda priblizny tvar priebehu bitky.
+
+Teraz sa podme pozriet na cas bitky.
+Zjavne, ak X==Y==N, tak je cas potrebny na ukoncenie remizou
+t=SUM[a*1/i,{i,1,N}], nakolko vzdy naraz zomre 1 clovek od oboch superov a
+ked i ludi striela na jedneho, trva to cas a/i.
+
+Ak X>Y, je jasne, ze vyhra hrac X.
+v tomto pripade rieseme rovnicu
+y(t)==0
+Y*cosh(t/a)==X*sinh(t/a)
+Y/X=tanh(t/a)
+t=a*arctanh(Y/X)
+
+Pritom arctanh(q)=1/2(log(1+q)-log(1-q))
+Takze t=a/2*(log(1+Y/X)-log(1-Y/X))
+
+Zjavne, ak X=Y, tak nam vyjde nekonecno, pretoze budu stale menej po sebe strielat.
+(pokial je ich pocet kontinualny, nie diskretny) Nakolko je ich pocet diskretny,
+bude priebeh ako som uz opisal.
+
+Analogicky, ak X<Y, tak
+t=a/2*log(1+X/y)-log(1-X/y)).
+
+Nakoniec este dodam, ze ak X je priblizne rovne Y (rozumej 1-X/Y<10^-10 a pod. ), potom
+by bolo vhodnejsie zratat si rovnicu pre
+x(t)==k, kde k je nejaka vhodna konstanta, doratat y a nejako rozumne aproximovat zvysny dej,
+pretoze v tomto pripade nastava neprijemna vec a to ze sa velmi prejavuje
+kontinualnost procesu versus diskretnost v skutocnosti.
+     
