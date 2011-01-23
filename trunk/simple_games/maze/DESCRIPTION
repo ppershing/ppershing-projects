@@ -1,0 +1,4 @@
+This game is simple multiplayer maze over UDP.
+The real challenge is that you controls movement on your friend's
+monitor, so he need to pass you the information about movements.
+Best played without words over 50-500 meters.

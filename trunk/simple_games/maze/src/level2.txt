@@ -1,0 +1,25 @@
+back0.bmp
+30
+food.bmp
+cristal1.bmp
+19   sirka
+19  vyska
+BBBBBBBBBBBBBBBBBBB
+B.....B...B.......B
+BBB.B.B.B.B.BBBBB.B
+B...B.B.B...B.B...B
+B.BBBBB.BBBBB.B.B.B
+B.....B.......B.B.B
+B.BBB.BBBBB.BBB.B.B
+B.B.B.B.....B...B.B
+B.B.B.B.BBBBB.BBB.B
+B.B.B.......B...B.B
+B.B.BBBBBBBBBBB.BBB
+B.....BP........B.B
+BBBBB.B.BBBBBBBBB.B
+B.....B...........B
+B.BBBBBBBBBBBBBBBBB
+B...B...........B.B
+BBB.BBBBBBB.BBB.B.B
+B...........B.....B
+BBBBBBBBBBBBBBBBBCB

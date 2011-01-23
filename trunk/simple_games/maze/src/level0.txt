@@ -1,0 +1,15 @@
+back0.bmp
+30
+food.bmp
+cristal1.bmp
+9   sirka
+9  vyska
+BBBBBBBBB
+B......PB
+B.BBBBBBB
+B...B...B
+BBB.B.B.B
+B...B.B.B
+B.BBB.B.B
+B.....B.B
+BBBBBBBCB

@@ -1,0 +1,218 @@
+unit libudp;
+
+interface
+uses Idudpclient,idudpserver,extctrls,messagequeue,classes,
+idsockethandle;
+
+const TICK_TIME=30;
+const UDP_SEND=42;
+const UDP_ACK=47;
+const MAX_BUFFER_SIZE=30000;
+
+
+
+
+type tudpconnection=class
+private
+ client_udp:TidUDPClient;
+ server_udp:TidUDPServer;
+ timer:ttimer;
+ destination:string;
+ port:integer;
+ sent_packets,old_sent_packets:integer;
+ received_acks,old_received_acks:integer;
+ retransmissions,old_retransmissions:integer;
+ packet_id:integer;
+ queue:tmessagequeue;
+ have_ack:integer;
+ last_received_id:integer;
+
+ procedure tick(sender:tobject);
+ procedure send_from_queue;
+ procedure send_ack(packet_id:integer);
+
+ procedure server_read_data(Sender: TObject;
+           AData: TStream; ABinding: TIdSocketHandle);
+public
+ received_data:tmessagequeue;
+
+ constructor create(dest:string;myport:integer);
+ destructor destroy;    override;
+ function get_percent_acks:integer;
+ function get_retransmission_count:integer;
+ function get_queue_size:integer;
+ function send(data:tudpdata):boolean;
+end;
+
+implementation
+
+constructor tudpconnection.create(dest:string;myport:integer);
+begin
+ client_udp:=tidudpclient.create(nil);
+ client_udp.BufferSize:=MAX_BUFFER_SIZE;
+
+ server_udp:=tidudpserver.create(nil);
+ server_udp.DefaultPort:=myport;
+ server_udp.BufferSize:=MAX_BUFFER_SIZE;
+ server_udp.OnUDPRead:=server_read_data;
+ server_udp.Active:=true;
+
+ timer:=ttimer.create(nil);
+ timer.Interval:=TICK_TIME;
+ timer.OnTimer:=tick;
+
+ queue:=tmessagequeue.create();
+ received_data:=tmessagequeue.create();
+
+ destination:=dest;
+ port:=myport;
+ sent_packets:=0;
+ old_sent_packets:=0;
+ received_acks:=0;
+ old_received_acks:=0;
+ retransmissions:=0;
+ old_retransmissions:=0;
+ packet_id:=1;
+ have_ack:=0;
+ last_received_id:=0;
+end;
+
+destructor tudpconnection.destroy;
+begin
+timer.enabled:=false;
+timer.destroy;
+client_udp.destroy;
+server_udp.destroy;
+queue.destroy;
+received_data.destroy;
+end;
+
+
+procedure tudpconnection.send_from_queue;
+var buf:array[0..MAX_BUFFER_SIZE] of byte;
+    data:tudpdata;
+begin
+try
+assert(not queue.empty,'Trying to send data when none are present');
+have_ack:=0;
+inc(sent_packets);
+client_udp.Host:=destination;
+client_udp.port:=port;
+client_udp.Active:=true;
+client_udp.broadcastenabled:=false;
+buf[0]:=UDP_SEND;         // byte 0 is packet type
+buf[1]:=0;                // reserved bytes
+buf[2]:=0;
+buf[3]:=0;
+buf[4]:=0;
+move(packet_id,buf[5],4); // bytes [5..8] are packet id
+data:=queue.front;
+move(data.length,buf[9],4); // bytes[9..12] are data length
+move(data.data,buf[13],data.length);
+client_udp.SendBuffer(buf,data.length+13);
+except
+  assert(false,' xx');
+end;
+end;
+
+procedure tudpconnection.send_ack
+                      (packet_id:integer);
+var buf:array[0..MAX_BUFFER_SIZE] of byte;
+begin
+client_udp.Host:=destination;
+client_udp.port:=port;
+client_udp.Active:=true;
+client_udp.broadcastenabled:=false;
+buf[0]:=UDP_ACK;         // byte 0 is packet type
+buf[1]:=0;                // reserved bytes
+buf[2]:=0;
+buf[3]:=0;
+buf[4]:=0;
+move(packet_id,buf[5],4); // bytes [5..8] are packet id
+buf[9]:=0;
+buf[10]:=0;
+buf[11]:=0;
+buf[12]:=0;
+client_udp.SendBuffer(buf,13);
+end;
+
+
+procedure tudpconnection.tick(sender:tobject);
+begin
+if (have_ack>0) then
+ begin
+   if (have_ack=packet_id) then
+    begin
+     assert(not queue.empty,
+        'Fatal - ack when no message');
+     queue.pop;
+     inc(packet_id);
+     inc(received_acks);
+    end;
+ end
+ else
+ begin
+  if (not queue.empty) then inc(retransmissions);
+ end;
+
+if (not queue.empty) then send_from_queue;
+end;
+
+function tudpconnection.get_percent_acks:integer;
+begin
+ result:=((received_acks-old_received_acks+1) * 100) div
+  (sent_packets-old_sent_packets+1);
+ old_received_acks:=received_acks;
+ old_sent_packets:=sent_packets;
+end;
+
+function tudpconnection.send(data:tudpdata):boolean;
+begin
+ result:=queue.push(data);
+end;
+
+function tudpconnection.get_retransmission_count:integer;
+begin
+ result:=retransmissions-old_retransmissions;
+ old_retransmissions:=retransmissions;
+end;
+
+function tudpconnection.get_queue_size:integer;
+begin
+ result:=queue.size;
+end;
+
+procedure tudpconnection.server_read_data(Sender: TObject;
+           AData: TStream; ABinding: TIdSocketHandle);
+var size:integer;
+    buf:array[0..MAX_BUFFER_SIZE] of byte;
+    id:integer;
+    data:tudpdata;
+begin
+ size:=adata.size;
+ assert(size>12,'Too short data - ?');
+ adata.read(buf,size);
+ if (buf[0]=UDP_ACK) then
+   begin
+     // we have ack reply
+     move(buf[5],have_ack,4);
+      // copy packet_id to ack information
+     // and drop that packet
+   end
+ else if (buf[0]=UDP_SEND) then
+   begin
+    move(buf[5],id,4);
+      // id is packet id
+    if (id<>last_received_id) then
+     begin
+      move(buf[9],data.length,4);
+      move(buf[13],data.data,data.length);
+      assert(received_data.push(data),'Received queue owerflow');
+     end;                                
+     assert(abinding.peerip=destination,'Wrong sender - mixed connection?');
+    // send ack
+    send_ack(id);
+   end;
+end;
+
+end.
