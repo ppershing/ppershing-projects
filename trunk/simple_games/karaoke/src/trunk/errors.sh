@@ -1,0 +1,1 @@
+./parse_errors.pl Karaoke.exe Karaoke.log
