@@ -1,0 +1,8 @@
+// This file is automatically modified each build
+// and contains basic data about product
+// it is included by version.cpp
+#define MAJOR 0
+#define MINOR 7
+#define BUILD 1565
+#define BUILD_NAME "alpha"
+#define BUILD_STATE "unstable/testing"

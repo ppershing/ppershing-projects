@@ -1,0 +1,12 @@
+#TITLE:__test__
+#ARTIST:PPershing
+#MP3:test.mp3
+#GAP:0
+#BPM:15
+: 0 0 80 
+-4
+: 5 1 81 A
+: 6 1 83 B
+: 7 1 56 C
+: 9 0 80 
+E

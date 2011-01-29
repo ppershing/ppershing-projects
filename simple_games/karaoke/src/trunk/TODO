@@ -1,0 +1,38 @@
+FIXME: all- use unsigned int when using lengths
+
+MyStringUtils:search&replace
+
+Strings:: - navrh, loadovanie, atd.
+Errors:: circular buffer
+
+AudioUtils,Audio - postarat sa o AudioSamples,
+(sampleRate, channelCount verifikovanie)
+
+Audio - mixovanie playback&SFX
+
+SFX - cela class
+
+AudioUtils - potrebne utility
+
+Scale - jednoduchy scaler, jednorozmerny metric
+Metric - checkovat na mimo rozsah/ moznost vypnutia checku
+
+MicrophoneInput
+
+Preferences: podedene preferencie, comitovanie do inych preferencii
+
+u singletonov dat pozor na assigment&operator=, mohli by hadzat
+vynimku
+
+Audio::isInitialized();
+Audio:enable boost volume (>1)
+Audio:enable/disable (ako pauza)
+Timer:enable/disable
+Timer: mozno spravit classu specialne na to urcenu
+
+este raz prebehnut na const, &
+nech precheckovat misofovi
+
+commandline arguments
+
+GameEngine::processMessages
