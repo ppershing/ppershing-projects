@@ -1,0 +1,265 @@
+object Form1: TForm1
+  Left = 407
+  Height = 508
+  Top = 87
+  Width = 978
+  HorzScrollBar.Visible = False
+  VertScrollBar.Visible = False
+  Caption = 'Form1'
+  ClientHeight = 508
+  ClientWidth = 978
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.30.2'
+  object image: TImage
+    Left = 152
+    Height = 150
+    Top = 8
+    Width = 800
+  end
+  object slovko_label: TLabel
+    Left = 16
+    Height = 40
+    Top = 376
+    Width = 201
+    Alignment = taCenter
+    Caption = 'slovko_label'
+    Font.Color = clWindowText
+    Font.Height = -33
+    Font.Name = 'Times New Roman'
+    ParentColor = False
+    ParentFont = False
+  end
+  object load_button: TButton
+    Left = 8
+    Height = 25
+    Top = 32
+    Width = 129
+    Caption = 'load'
+    OnClick = load_buttonClick
+    TabOrder = 0
+  end
+  object save_button: TButton
+    Left = 8
+    Height = 25
+    Top = 88
+    Width = 129
+    Caption = 'save'
+    OnClick = save_buttonClick
+    TabOrder = 1
+  end
+  object file_edit: TEdit
+    Left = 8
+    Height = 23
+    Top = 8
+    Width = 129
+    OnDblClick = file_editDblClick
+    TabOrder = 2
+    Text = '~/aj/slovka.dat'
+  end
+  object sk_edit: TEdit
+    Left = 8
+    Height = 23
+    Top = 192
+    Width = 129
+    OnKeyPress = sk_editKeyPress
+    TabOrder = 3
+  end
+  object en_edit: TEdit
+    Left = 8
+    Height = 23
+    Top = 224
+    Width = 129
+    OnChange = en_editChange
+    OnKeyPress = en_editKeyPress
+    TabOrder = 4
+  end
+  object add_button: TButton
+    Left = 8
+    Height = 25
+    Top = 256
+    Width = 129
+    Caption = 'add'
+    OnClick = add_buttonClick
+    TabOrder = 5
+  end
+  object slovka_list: TListBox
+    Left = 440
+    Height = 177
+    Top = 168
+    Width = 513
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    ItemHeight = 0
+    OnClick = slovka_listClick
+    ParentFont = False
+    ScrollWidth = 511
+    TabOrder = 6
+    TopIndex = -1
+  end
+  object answer: TEdit
+    Left = 184
+    Height = 34
+    Top = 424
+    Width = 441
+    Font.Color = clWindowText
+    Font.Height = -20
+    Font.Name = 'MS Sans Serif'
+    OnKeyPress = answerKeyPress
+    ParentFont = False
+    TabOrder = 7
+    Text = 'answer'
+  end
+  object Memo1: TMemo
+    Left = 152
+    Height = 177
+    Top = 168
+    Width = 281
+    ScrollBars = ssVertical
+    TabOrder = 8
+  end
+  object edit_button: TButton
+    Left = 8
+    Height = 25
+    Top = 288
+    Width = 129
+    Caption = 'edit'
+    OnClick = edit_buttonClick
+    TabOrder = 9
+  end
+  object delete_button: TButton
+    Left = 8
+    Height = 25
+    Top = 320
+    Width = 129
+    Caption = 'delete'
+    OnClick = delete_buttonClick
+    TabOrder = 10
+  end
+  object sort_opt: TRadioGroup
+    Left = 856
+    Height = 89
+    Top = 352
+    Width = 97
+    AutoFill = True
+    Caption = 'sort'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.TopBottomSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 1
+    ClientHeight = 74
+    ClientWidth = 93
+    ItemIndex = 2
+    Items.Strings = (
+      'alpha. en'
+      'alpha. sk'
+      'rating'
+      'ok/all'
+      'last'
+    )
+    OnClick = sort_optClick
+    TabOrder = 11
+  end
+  object randomness: TTrackBar
+    Left = 744
+    Height = 41
+    Top = 448
+    Width = 209
+    Frequency = 10
+    Max = 0
+    Min = -100
+    Position = -30
+    TabOrder = 12
+  end
+  object sort_box: TCheckBox
+    Left = 752
+    Height = 22
+    Top = 392
+    Width = 47
+    Caption = 'sort'
+    Checked = True
+    State = cbChecked
+    TabOrder = 13
+  end
+  object new_button: TButton
+    Left = 8
+    Height = 25
+    Top = 120
+    Width = 129
+    Caption = 'new/clear'
+    OnClick = new_buttonClick
+    TabOrder = 14
+  end
+  object clear_button: TButton
+    Left = 416
+    Height = 17
+    Top = 352
+    Width = 17
+    OnClick = clear_buttonClick
+    TabOrder = 15
+  end
+  object clear_history_button: TButton
+    Left = 8
+    Height = 25
+    Top = 152
+    Width = 129
+    Caption = 'clear history'
+    OnClick = clear_history_buttonClick
+    TabOrder = 16
+  end
+  object load_merge: TCheckBox
+    Left = 8
+    Height = 22
+    Top = 64
+    Width = 85
+    Caption = 'load_merge'
+    TabOrder = 17
+  end
+  object zobraz_listbox: TCheckBox
+    Left = 752
+    Height = 22
+    Top = 416
+    Width = 97
+    Caption = 'zobraz_listbox'
+    TabOrder = 18
+  end
+  object delete_duplicates: TButton
+    Left = 32
+    Height = 41
+    Top = 456
+    Width = 153
+    Caption = 'delete_duplicates'
+    OnClick = delete_duplicatesClick
+    TabOrder = 19
+    Visible = False
+  end
+  object merge_add_text: TEdit
+    Left = 88
+    Height = 23
+    Top = 64
+    Width = 49
+    TabOrder = 20
+  end
+  object Timer1: TTimer
+    Interval = 500
+    OnTimer = Timer1Timer
+    left = 24
+    top = 400
+  end
+  object OpenDialog1: TOpenDialog
+    DefaultExt = '.dat'
+    Filter = 'dat|*.dat|all|*'
+    left = 152
+    top = 24
+  end
+end
