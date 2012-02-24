@@ -1,14 +1,54 @@
 ver.2.0
-27
+85
+:Uberraschung
+prekvapenie
+49 0 1 72 0
+0.00000
+
 :uberrascht
 prekvapeny
 13 0 1 8 0
 0.00000
 
+abfeuern
+vystrelit, odpalit
+70 0 1 46 0
+0.00000
+
+abst:urzen
+zrutit sa
+82 0 0 0 0
+0.00000
+
+anlegen
+zalozit, zriadit, obliect
+36 0 2 64 0
+0.00000
+
+annehmen
+prijat
+30 0 0 0 0
+0.00000
+
 anspringen
 napadnut, vyskocit
-25 1 1 4 129
+25 1 1 4 79
 0.30000
+
+antworten
+odpovedat, dat odpoved
+44 3 3 31 432
+0.65700
+
+aufregen
+rozculovat, rozrusovat
+60 0 0 0 0
+0.00000
+
+bald
+skoro, zakratko, onedlho
+80 0 0 0 0
+0.00000
 
 behandeln
 zaobchadzat, nakladat, jednat
@@ -17,8 +57,13 @@ zaobchadzat, nakladat, jednat
 
 dabei
 pri tom, na tom
-7 1 1 1 124
+7 1 1 1 78
 0.30000
+
+daran
+na tom
+33 0 1 44 0
+0.00000
 
 das Aschenputtel
 popoluska
@@ -27,7 +72,12 @@ popoluska
 
 das Fenster
 okno
-18 0 1 5 0
+18 0 2 79 0
+0.00000
+
+das Halsband
+obojok
+31 0 2 76 0
 0.00000
 
 das Haus
@@ -37,37 +87,117 @@ dom
 
 das Land
 zem, pevnina
-21 1 1 3 127
-0.30000
+21 2 3 73 166
+0.35700
 
 das M:archen
 rozpravka
 2 0 0 0 0
 0.00000
 
+das Versteck
+ukryt, skrysa
+74 0 2 75 0
+0.00000
+
+der Boden
+poda, zem
+83 0 1 20 0
+0.00000
+
+der Bogensch:utze
+lucistnik, lukostrelec
+81 0 1 49 0
+0.00000
+
+der Himmel
+obloha, nebo
+55 0 2 81 0
+0.00000
+
 der Junge
 chlapec
-17 1 1 11 146
+17 1 1 11 81
 0.30000
+
+der Pfiff
+hvizd
+65 0 1 41 0
+0.00000
 
 der Schatten
 tien
 27 0 1 12 0
 0.00000
 
+der Staub
+prach
+48 0 0 0 0
+0.00000
+
+der Zorn
+hnev, zlost
+84 0 1 65 0
+0.00000
+
+die Aussicht
+vyhlad, pohlad
+62 0 0 0 0
+0.00000
+
+die Eichel
+zalud
+32 0 1 21 0
+0.00000
+
+die Fee
+vila
+47 1 1 16 83
+0.30000
+
+die Freude
+radost, potesenie, veselost
+50 0 2 59 0
+0.00000
+
 die Geschwister
 surodenci
-5 0 0 0 0
+5 0 1 25 0
+0.00000
+
+die Hexe
+striga, carodejnica
+78 2 2 47 275
+0.51000
+
+die Insel
+ostrov
+59 4 4 82 638
+0.75990
+
+die Kugel
+gula
+66 0 0 0 0
+0.00000
+
+die L:ugnerin
+klamarka
+85 0 1 19 0
 0.00000
 
 die Stiefmutter
 macocha
-1 0 0 0 0
+1 0 1 80 0
 0.00000
 
 die Stimme
 hlas
-10 0 0 0 0
+10 1 2 70 119
+0.30000
+
+dort
+tam, tamto
+39 0 1 27 0
 0.00000
 
 drauSen
@@ -80,29 +210,114 @@ otocit, stocit, krutit
 14 0 0 0 0
 0.00000
 
+eifers:uchtig
+ziarlivy
+77 0 3 55 0
+0.00000
+
 einmal
 jedenkrat, kedysi, niekedy
-6 1 1 6 132
+6 1 1 6 80
 0.30000
+
+erreichen
+dosiahnut, dosahovat
+79 1 1 26 88
+0.30000
+
+erwidern
+odpovedat, odvedit
+43 0 2 78 0
+0.00000
+
+erz:ahlen
+rozpravat, vykladat
+40 0 3 83 0
+0.00000
 
 fragen
 spytat sa
-20 0 0 0 0
+20 1 1 60 109
+0.30000
+
+gefallen
+pacit sa
+35 0 1 74 0
+0.00000
+
+genieSen
+uzivat si, tesit sa
+63 0 0 0 0
+0.00000
+
+gerne
+rad, s radostou
+41 0 0 0 0
+0.00000
+
+glitzern
+ligotat sa
+46 0 1 63 0
 0.00000
 
 grausam
 kruty, bezcitny
-12 0 1 9 0
+12 0 2 84 0
+0.00000
+
+hoch
+vysoky
+53 1 1 37 93
+0.30000
+
+knapp
+tesne, nedostacujuci
+67 0 0 0 0
+0.00000
+
+laut
+hlasity, hlasny
+69 0 1 36 0
+0.00000
+
+leuchten
+svietit ,ziarit
+76 0 1 71 0
+0.00000
+
+mitbringen
+priniest so sebou
+34 0 1 14 0
+0.00000
+
+mitkommen
+ist spolu, odprevadit
+42 0 1 66 0
+0.00000
+
+nahmen
+vziat, zobrat
+28 0 0 0 0
 0.00000
 
 nimmermehr
 uz nikdy/nikdy viac
-22 0 0 0 0
+22 0 1 58 0
 0.00000
 
 offen
 otvoreny
-23 0 0 0 0
+23 1 1 28 89
+0.30000
+
+pl:otzlich
+necakany, nahly
+64 0 1 45 0
+0.00000
+
+rufen
+(za)volat
+58 0 1 24 0
 0.00000
 
 ruhig
@@ -110,9 +325,29 @@ pokohny, tichy, mierny
 4 0 0 0 0
 0.00000
 
+schauen
+divas ta, hladiet, pozerat
+56 0 0 0 0
+0.00000
+
 schnappen
 uchmatnut, polapit
-26 0 0 0 0
+26 0 2 54 0
+0.00000
+
+schreien
+kricat, revat, hulakat
+75 0 0 0 0
+0.00000
+
+schweben
+vznasat sa
+51 0 1 40 0
+0.00000
+
+segeln
+plachtit, plavat plachetnicou
+71 0 1 57 0
 0.00000
 
 seltsam
@@ -120,18 +355,73 @@ cudny, podivuhodny
 16 0 0 0 0
 0.00000
 
+sogleich
+ihned, okamzite
+52 0 1 85 0
+0.00000
+
 springen
 skocit, skakat
-24 0 0 0 0
+24 0 1 30 0
+0.00000
+
+sternenklar
+hviezdna, jasna
+54 0 1 69 0
 0.00000
 
 umdrehen
 obratit sa, otocit sa
-15 0 0 0 0
+15 0 1 50 0
+0.00000
+
+verlieren
+stratit
+38 0 0 0 0
+0.00000
+
+verstreuen
+rozsypat, rozhadzat
+45 0 2 68 0
+0.00000
+
+vielleicht
+mozno, azda, hadam, vari
+37 0 0 0 0
+0.00000
+
+vorbei
+okolo, vedla
+68 1 2 67 115
+0.30000
+
+w:utend
+rozzureny, zurivy
+72 0 1 13 0
+0.00000
+
+weil
+pretoze
+73 0 1 33 0
 0.00000
 
 wer?
 kto?
-19 1 1 13 164
-0.30000
+19 2 2 62 292
+0.51000
+
+wieder
+zas, opat, znova
+29 0 1 39 0
+0.00000
+
+wundervoll
+corovny, carokrasny
+61 0 0 0 0
+0.00000
+
+zeigen
+ukazat, ukazovat
+57 0 0 0 0
+0.00000
 
