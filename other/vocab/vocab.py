@@ -5,6 +5,7 @@ import random
 import sys
 from termcolor import colored
 import time
+import speak
 
 
 class config:
@@ -163,7 +164,9 @@ vocab.loadFromFile(config.VOCABLUARY)
 
 h = Histogram(80, 10, '*')
 
+e = None
 while True:
+    old_e = e
     e = vocab.chooseEntry(MagicChooser.chooseEntry)
     print
     print
@@ -185,6 +188,9 @@ while True:
             a = raw_input()
             if a == "yes":
                 sys.exit()
+        elif (answer == "/play"):
+            speak.download_speech('de', "die Junge", "/tmp/x.mp3")
+            speak.play_speech("/tmp/x.mp3")
         else:
             print "unknown command"
         continue
