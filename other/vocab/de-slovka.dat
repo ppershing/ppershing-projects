@@ -1,44 +1,39 @@
 ver.2.0
 85
-:Uberraschung
-prekvapenie
-49 0 1 72 0
-0.00000
-
 :uberrascht
 prekvapeny
-13 0 1 8 0
-0.00000
+13 1 4 282 65
+0.21000
 
 abfeuern
 vystrelit, odpalit
-70 0 1 46 0
+70 0 3 246 0
 0.00000
 
 abst:urzen
 zrutit sa
-82 0 0 0 0
+82 0 2 163 0
 0.00000
 
 anlegen
 zalozit, zriadit, obliect
-36 0 2 64 0
+36 0 3 257 0
 0.00000
 
 annehmen
 prijat
-30 0 0 0 0
-0.00000
+30 1 3 289 132
+0.30000
 
 anspringen
 napadnut, vyskocit
-25 1 1 4 79
-0.30000
+25 1 3 144 11
+0.14700
 
 antworten
 odpovedat, dat odpoved
-44 3 3 31 432
-0.65700
+44 4 4 166 537
+0.75990
 
 aufregen
 rozculovat, rozrusovat
@@ -47,38 +42,38 @@ rozculovat, rozrusovat
 
 bald
 skoro, zakratko, onedlho
-80 0 0 0 0
-0.00000
+80 2 3 169 219
+0.51000
 
 behandeln
 zaobchadzat, nakladat, jednat
-9 0 2 10 0
+9 0 7 262 0
 0.00000
 
 dabei
 pri tom, na tom
-7 1 1 1 78
-0.30000
+7 1 2 89 21
+0.21000
 
 daran
 na tom
-33 0 1 44 0
-0.00000
+33 1 3 161 28
+0.21000
 
 das Aschenputtel
 popoluska
-8 0 0 0 0
+8 0 1 183 0
 0.00000
 
 das Fenster
 okno
-18 0 2 79 0
-0.00000
+18 3 5 269 460
+0.65700
 
 das Halsband
 obojok
-31 0 2 76 0
-0.00000
+31 1 4 255 49
+0.21000
 
 das Haus
 dom
@@ -87,302 +82,307 @@ dom
 
 das Land
 zem, pevnina
-21 2 3 73 166
-0.35700
+21 4 5 163 423
+0.68493
 
 das M:archen
 rozpravka
-2 0 0 0 0
-0.00000
+2 2 3 219 245
+0.51000
 
 das Versteck
 ukryt, skrysa
-74 0 2 75 0
+74 0 4 115 0
 0.00000
 
 der Boden
 poda, zem
-83 0 1 20 0
-0.00000
+83 1 3 184 70
+0.30000
 
 der Bogensch:utze
 lucistnik, lukostrelec
-81 0 1 49 0
-0.00000
+81 4 6 170 539
+0.75990
 
 der Himmel
 obloha, nebo
-55 0 2 81 0
-0.00000
+55 1 4 221 81
+0.30000
 
 der Junge
 chlapec
-17 1 1 11 81
-0.30000
+17 3 3 108 362
+0.65700
 
 der Pfiff
 hvizd
-65 0 1 41 0
-0.00000
+65 2 5 281 242
+0.44700
 
 der Schatten
 tien
-27 0 1 12 0
+27 0 3 279 0
 0.00000
 
 der Staub
 prach
-48 0 0 0 0
+48 0 4 258 0
 0.00000
 
 der Zorn
 hnev, zlost
-84 0 1 65 0
+84 0 2 215 0
+0.00000
+
+die :Uberraschung
+prekvapenie
+49 0 6 252 0
 0.00000
 
 die Aussicht
 vyhlad, pohlad
-62 0 0 0 0
+62 0 4 207 0
 0.00000
 
 die Eichel
 zalud
-32 0 1 21 0
+32 0 4 275 0
 0.00000
 
 die Fee
 vila
-47 1 1 16 83
-0.30000
+47 2 2 146 210
+0.51000
 
 die Freude
 radost, potesenie, veselost
-50 0 2 59 0
+50 0 3 248 0
 0.00000
 
 die Geschwister
 surodenci
-5 0 1 25 0
-0.00000
+5 2 4 217 244
+0.51000
 
 die Hexe
 striga, carodejnica
-78 2 2 47 275
-0.51000
+78 4 4 153 532
+0.75990
 
 die Insel
 ostrov
-59 4 4 82 638
+59 4 4 82 506
 0.75990
 
 die Kugel
 gula
-66 0 0 0 0
-0.00000
+66 1 1 178 68
+0.30000
 
 die L:ugnerin
 klamarka
-85 0 1 19 0
+85 0 4 295 0
 0.00000
 
 die Stiefmutter
 macocha
-1 0 1 80 0
-0.00000
+1 2 6 268 185
+0.40290
 
 die Stimme
 hlas
-10 1 2 70 119
-0.30000
+10 4 5 121 519
+0.75990
 
 dort
 tam, tamto
-39 0 1 27 0
-0.00000
+39 2 7 267 286
+0.51000
 
 drauSen
 vonku
-11 0 0 0 0
+11 0 3 203 0
 0.00000
 
 drehen
 otocit, stocit, krutit
-14 0 0 0 0
+14 0 2 271 0
 0.00000
 
 eifers:uchtig
 ziarlivy
-77 0 3 55 0
+77 0 8 245 0
 0.00000
 
 einmal
 jedenkrat, kedysi, niekedy
-6 1 1 6 80
-0.30000
+6 2 3 225 190
+0.44700
 
 erreichen
 dosiahnut, dosahovat
-79 1 1 26 88
-0.30000
+79 1 4 238 10
+0.10290
 
 erwidern
 odpovedat, odvedit
-43 0 2 78 0
+43 0 4 251 0
 0.00000
 
 erz:ahlen
 rozpravat, vykladat
-40 0 3 83 0
-0.00000
+40 1 6 255 49
+0.21000
 
 fragen
 spytat sa
-20 1 1 60 109
-0.30000
+20 2 2 130 204
+0.51000
 
 gefallen
 pacit sa
-35 0 1 74 0
+35 0 4 292 0
 0.00000
 
 genieSen
 uzivat si, tesit sa
-63 0 0 0 0
+63 0 4 263 0
 0.00000
 
 gerne
 rad, s radostou
-41 0 0 0 0
-0.00000
+41 1 3 284 124
+0.30000
 
 glitzern
 ligotat sa
-46 0 1 63 0
-0.00000
+46 2 3 259 277
+0.51000
 
 grausam
 kruty, bezcitny
-12 0 2 84 0
+12 0 5 250 0
 0.00000
 
 hoch
 vysoky
-53 1 1 37 93
-0.30000
+53 2 2 156 214
+0.51000
 
 knapp
 tesne, nedostacujuci
-67 0 0 0 0
-0.00000
+67 2 3 276 297
+0.51000
 
 laut
 hlasity, hlasny
-69 0 1 36 0
-0.00000
+69 1 2 176 68
+0.30000
 
 leuchten
 svietit ,ziarit
-76 0 1 71 0
+76 0 2 233 0
 0.00000
 
 mitbringen
 priniest so sebou
-34 0 1 14 0
-0.00000
+34 2 3 167 218
+0.51000
 
 mitkommen
 ist spolu, odprevadit
-42 0 1 66 0
-0.00000
+42 1 3 285 125
+0.30000
 
-nahmen
+nehmen
 vziat, zobrat
-28 0 0 0 0
-0.00000
+28 1 5 254 97
+0.30000
 
 nimmermehr
 uz nikdy/nikdy viac
-22 0 1 58 0
-0.00000
+22 1 5 283 123
+0.30000
 
 offen
 otvoreny
-23 1 1 28 89
-0.30000
+23 4 4 140 527
+0.75990
 
 pl:otzlich
 necakany, nahly
-64 0 1 45 0
-0.00000
+64 1 8 286 69
+0.21000
 
 rufen
 (za)volat
-58 0 1 24 0
-0.00000
+58 1 3 198 74
+0.30000
 
 ruhig
 pokohny, tichy, mierny
-4 0 0 0 0
-0.00000
+4 2 3 236 257
+0.51000
 
 schauen
 divas ta, hladiet, pozerat
-56 0 0 0 0
+56 0 2 270 0
 0.00000
 
 schnappen
 uchmatnut, polapit
-26 0 2 54 0
-0.00000
+26 1 3 118 56
+0.30000
 
 schreien
 kricat, revat, hulakat
-75 0 0 0 0
-0.00000
+75 2 3 294 341
+0.51000
 
 schweben
 vznasat sa
-51 0 1 40 0
+51 0 5 291 0
 0.00000
 
 segeln
 plachtit, plavat plachetnicou
-71 0 1 57 0
-0.00000
+71 2 3 256 274
+0.51000
 
 seltsam
 cudny, podivuhodny
-16 0 0 0 0
+16 0 4 266 0
 0.00000
 
 sogleich
 ihned, okamzite
-52 0 1 85 0
-0.00000
+52 3 6 159 383
+0.65700
 
 springen
 skocit, skakat
-24 0 1 30 0
-0.00000
+24 1 3 293 80
+0.21000
 
 sternenklar
 hviezdna, jasna
-54 0 1 69 0
-0.00000
+54 2 5 213 241
+0.51000
 
 umdrehen
 obratit sa, otocit sa
-15 0 1 50 0
+15 0 5 264 0
 0.00000
 
 verlieren
 stratit
-38 0 0 0 0
+38 0 3 278 0
 0.00000
 
 verstreuen
 rozsypat, rozhadzat
-45 0 2 68 0
+45 0 3 116 0
 0.00000
 
 vielleicht
@@ -392,36 +392,36 @@ mozno, azda, hadam, vari
 
 vorbei
 okolo, vedla
-68 1 2 67 115
-0.30000
+68 2 3 92 191
+0.51000
 
 w:utend
 rozzureny, zurivy
-72 0 1 13 0
+72 0 6 287 0
 0.00000
 
 weil
 pretoze
-73 0 1 33 0
-0.00000
+73 1 3 138 59
+0.30000
 
 wer?
 kto?
-19 2 2 62 292
+19 2 2 62 183
 0.51000
 
 wieder
 zas, opat, znova
-29 0 1 39 0
-0.00000
+29 1 5 290 134
+0.30000
 
 wundervoll
 corovny, carokrasny
-61 0 0 0 0
+61 0 1 247 0
 0.00000
 
 zeigen
 ukazat, ukazovat
-57 0 0 0 0
+57 0 3 201 0
 0.00000
 
