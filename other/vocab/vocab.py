@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# vim: set fileencoding=utf-8 :
 # vim: et:ts=4:sw=4:sts=4
 import math
 import random
@@ -6,7 +7,7 @@ import sys
 from termcolor import colored
 import time
 import speak
-
+import os.path
 
 class config:
     # the higher the number, the more slowly will knowledge adapt to new results
@@ -17,7 +18,8 @@ class config:
     # TODO
     POKUSOV = 10
     #
-    VOCABLUARY = "slovka.dat"
+    VOCABLUARY = "de-slovka.dat"
+    VOCABLUARY = "fr-skola.dat"
 
 class Entry:
     def __init__(self, query, answer):
@@ -65,6 +67,7 @@ class Vocabluary:
     def __init__(self):
         self.entries = []
         self.epoch = 0
+        self.lang = ""
 
     def loadFromFile(self, filename):
         f = open(filename, 'r')
@@ -96,6 +99,8 @@ class Vocabluary:
         for e in self.entries:
             e.advanceAge(self.epoch)
         print "loaded %d entries" % sloviek
+        self.lang = os.path.basename(filename)[0:2]
+        print "Language: %s" % self.lang
 
     def saveToFile(self, filename):
         f = open(filename, 'w')
@@ -124,18 +129,22 @@ class Vocabluary:
 
 class MagicChooser:
     @classmethod
-    def chooseEntryAccept(cls, step):
+    def getThreshold(cls, step):
         koef = math.exp(config.RANDOMNESS) + 1
-        return math.pow(koef, step)
+        return math.pow(koef, step) - 1
 
     @classmethod
     def chooseEntry(cls, entries):
         assert entries
         for step in range(config.POKUSOV):
             e = random.choice(entries)
-            if e.getRating() <= cls.chooseEntryAccept(step):
+            if e.getRating() <= cls.getThreshold(step):
                 break
         return e
+
+    @classmethod
+    def getThresholds(cls):
+        return [cls.getThreshold(step) for step in range(config.POKUSOV)]
 
 class Histogram:
     def __init__(self, width, height, char):
@@ -148,7 +157,7 @@ class Histogram:
         values.sort();
         values.reverse()
         data = [ ['.' for y in range(self.height)] for x in range(self.width)]
-        maxval = max(values)
+        maxval = max(values) + 1e-7
         for x in range(self.width):
             sample = int(x * 1.0 / self.width * len(values))
             for y in range(int(values[sample] * 1.0 / maxval  * self.height)):
@@ -159,10 +168,23 @@ class Histogram:
             stream.write('\n')
         return
 
+def fix_accents(text):
+    ACCENT_REPLACE = [
+         [":a", "ä"],
+         [":o", "ö"],
+         [",e", "é"],
+         ["^e", "ê"],
+         ["SS", "ß"],
+        ]
+    for entry in ACCENT_REPLACE:
+        text = text.replace(entry[0], entry[1])
+    return text
+
 vocab = Vocabluary()
 vocab.loadFromFile(config.VOCABLUARY)
 
 h = Histogram(80, 10, '*')
+print MagicChooser.getThresholds()
 
 e = None
 while True:
@@ -174,35 +196,45 @@ while True:
     print e.getRating(), e.knowledge_score
     print colored(e.query, 'yellow', attrs=['bold'])
     answer = raw_input("Answer:")
+
+    CMD_SAVE = "/save"
+    CMD_PLAY = "/play"
+    CMD_EXIT = "/exit"
+    CMD_SAVE_EXIT = "/wq"
     if len(answer) > 1 and answer[0]=='/':
-        if (answer == "/save"):
+        if (answer == CMD_SAVE):
             print "saving..."
             vocab.saveToFile(config.VOCABLUARY)
-        elif (answer == "/wq"):
+        elif (answer == CMD_SAVE_EXIT):
             print "exitting..."
             vocab.saveToFile(config.VOCABLUARY)
             sys.exit()
-        elif (answer == "/exit"):
+        elif (answer == CMD_EXIT):
             print "exitting..."
             print "really?"
             a = raw_input()
             if a == "yes":
                 sys.exit()
-        elif (answer == "/play"):
-            speak.download_speech('de', "die Junge", "/tmp/x.mp3")
-            speak.play_speech("/tmp/x.mp3")
+        elif (answer[0:5] == CMD_PLAY):
+            if len(answer) == len(CMD_PLAY):
+                text = old_e.answer
+            else:
+                text = answer[len(CMD_PLAY):]
+            text = fix_accents(text)
+            speak.play(vocab.lang, text)
         else:
             print "unknown command"
+        e = old_e # go back
         continue
 
 
     print e
-    if answer == e.answer:
+    if fix_accents(answer) == fix_accents(e.answer):
         e.answerWasCorrect()
-        print colored(e.answer, 'green', attrs=['bold'])
+        print colored(fix_accents(e.answer), 'green', attrs=['bold'])
     else:
         e.answerWasBad()
-        print colored(e.answer, 'red', attrs=['bold'])
+        print colored(fix_accents(e.answer), 'red', attrs=['bold'])
         time.sleep(1)
     
     vocab.advance()
