@@ -8,23 +8,13 @@ from termcolor import colored
 import time
 import speak
 import os.path
-
-class config:
-    # the higher the number, the more slowly will knowledge adapt to new results
-    # setting 0 means "entirely last try", setting 1 means no adaptation at all
-    KNOWLEDGE_FACTOR = 0.7
-    # TODO
-    RANDOMNESS = -2.3
-    # TODO
-    POKUSOV = 10
-    #
-    VOCABLUARY = "de-slovka.dat"
-    VOCABLUARY = "fr-skola.dat"
+from config import Config
+import utils
 
 class Entry:
     def __init__(self, query, answer):
-        self.query = query
-        self.answer = answer
+        self.query = utils.fix_accents(query)
+        self.answer = utils.fix_accents(answer)
         # number of times a correct answer was given
         self.tries_ok = 0
         # number of times this entry was shown
@@ -42,13 +32,13 @@ class Entry:
         self.last_try_age = 0
         self.tries_all += 1
         self.tries_ok += 1
-        self.knowledge_score = self.knowledge_score * config.KNOWLEDGE_FACTOR + \
-                                (1 - config.KNOWLEDGE_FACTOR)
+        self.knowledge_score = self.knowledge_score * Config.KNOWLEDGE_FACTOR + \
+                                (1 - Config.KNOWLEDGE_FACTOR)
 
     def answerWasBad(self):
         self.last_try_age = 0
         self.tries_all += 1
-        self.knowledge_score = self.knowledge_score * config.KNOWLEDGE_FACTOR
+        self.knowledge_score = self.knowledge_score * Config.KNOWLEDGE_FACTOR
 
     def advanceAge(self, age = 1):
         self.last_try_age += age
@@ -60,7 +50,8 @@ class Entry:
 
     def __str__(self):
         return "%s -> %s (rating %.2f, knowledge %.2f (%d/%d), age: %d)" % (
-            self.query, self.answer, self.getRating(), self.knowledge_score,
+            self.query, self.answer,
+            self.getRating(), self.knowledge_score,
             self.tries_ok, self.tries_all, self.last_try_age)
 
 class Vocabluary:
@@ -127,16 +118,19 @@ class Vocabluary:
     def getAverageRating(self):
         return sum(map(lambda x: x.getRating(), self.entries)) / len(self.entries)
 
+    def add(self, entry):
+        self.entries.append(entry)
+
 class MagicChooser:
     @classmethod
     def getThreshold(cls, step):
-        koef = math.exp(config.RANDOMNESS) + 1
+        koef = math.exp(Config.RANDOMNESS) + 1
         return math.pow(koef, step) - 1
 
     @classmethod
     def chooseEntry(cls, entries):
         assert entries
-        for step in range(config.POKUSOV):
+        for step in range(Config.POKUSOV):
             e = random.choice(entries)
             if e.getRating() <= cls.getThreshold(step):
                 break
@@ -144,7 +138,7 @@ class MagicChooser:
 
     @classmethod
     def getThresholds(cls):
-        return [cls.getThreshold(step) for step in range(config.POKUSOV)]
+        return [cls.getThreshold(step) for step in range(Config.POKUSOV)]
 
 class Histogram:
     def __init__(self, width, height, char):
@@ -168,20 +162,9 @@ class Histogram:
             stream.write('\n')
         return
 
-def fix_accents(text):
-    ACCENT_REPLACE = [
-         [":a", "ä"],
-         [":o", "ö"],
-         [",e", "é"],
-         ["^e", "ê"],
-         ["SS", "ß"],
-        ]
-    for entry in ACCENT_REPLACE:
-        text = text.replace(entry[0], entry[1])
-    return text
 
 vocab = Vocabluary()
-vocab.loadFromFile(config.VOCABLUARY)
+vocab.loadFromFile(Config.VOCABLUARY)
 
 h = Histogram(80, 10, '*')
 print MagicChooser.getThresholds()
@@ -201,13 +184,15 @@ while True:
     CMD_PLAY = "/play"
     CMD_EXIT = "/exit"
     CMD_SAVE_EXIT = "/wq"
+    CMD_ADD = "/add/"
+    CMD_SEARCH = "/s/"
     if len(answer) > 1 and answer[0]=='/':
         if (answer == CMD_SAVE):
             print "saving..."
-            vocab.saveToFile(config.VOCABLUARY)
+            vocab.saveToFile(Config.VOCABLUARY)
         elif (answer == CMD_SAVE_EXIT):
             print "exitting..."
-            vocab.saveToFile(config.VOCABLUARY)
+            vocab.saveToFile(Config.VOCABLUARY)
             sys.exit()
         elif (answer == CMD_EXIT):
             print "exitting..."
@@ -215,13 +200,33 @@ while True:
             a = raw_input()
             if a == "yes":
                 sys.exit()
-        elif (answer[0:5] == CMD_PLAY):
+        elif (answer[0:len(CMD_PLAY)] == CMD_PLAY):
             if len(answer) == len(CMD_PLAY):
                 text = old_e.answer
             else:
                 text = answer[len(CMD_PLAY):]
-            text = fix_accents(text)
+            text = utils.fix_accents(text)
             speak.play(vocab.lang, text)
+        elif (answer[0:len(CMD_ADD)] == CMD_ADD):
+            tokens = answer[len(CMD_ADD):].split("/")
+            if len(tokens) == 2:
+                query = tokens[0]
+                response = tokens[1]
+                new_e = Entry(query, response)
+                vocab.add(new_e)
+                print colored('added %s' % new_e, 'green')
+                if Config.ADD_AUTOPLAY:
+                    speak.play(vocab.lang, utils.fix_accents(response))
+            else:
+                print colored('wrong add', 'red')
+            print tokens
+        elif (answer[0:len(CMD_SEARCH)] == CMD_SEARCH):
+            text = utils.fix_accents(answer[len(CMD_SEARCH):])
+            print colored('searching for ' + text, 'yellow')
+            for x in vocab.entries:
+                if x.answer.find(text) != -1:
+                    print x
+            print "EOF"
         else:
             print "unknown command"
         e = old_e # go back
@@ -229,12 +234,15 @@ while True:
 
 
     print e
-    if fix_accents(answer) == fix_accents(e.answer):
+    if utils.fix_accents(answer) == e.answer:
         e.answerWasCorrect()
-        print colored(fix_accents(e.answer), 'green', attrs=['bold'])
+        print colored(e.answer, 'green', attrs=['bold'])
     else:
         e.answerWasBad()
-        print colored(fix_accents(e.answer), 'red', attrs=['bold'])
+        print colored(e.answer, 'red', attrs=['bold'])
+        if Config.FAIL_AUTOPLAY:
+            speak.play('SK', e.query)
+            speak.play(vocab.lang, e.answer)
         time.sleep(1)
     
     vocab.advance()
