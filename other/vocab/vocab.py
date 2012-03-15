@@ -102,7 +102,7 @@ class Vocabluary:
             print >>f, entry.query
             print >>f, entry.id, entry.tries_ok, entry.tries_all, \
                 self.epoch - entry.last_try_age, \
-                int (1000 * entry.getRating())
+                -1 # int (1000 * entry.getRating()) # no rating provided
             print >>f, "%.5f" % entry.knowledge_score
             print >>f
 
