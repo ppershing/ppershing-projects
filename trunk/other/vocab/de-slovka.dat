@@ -1,427 +1,612 @@
 ver.2.0
-85
-:uberrascht
-prekvapeny
-13 1 4 282 65
+122
+überrascht
+prekvapený
+13 1 4 282 -1
 0.21000
 
 abfeuern
-vystrelit, odpalit
-70 0 3 246 0
+vystreliť, odpáliť
+70 0 3 246 -1
 0.00000
 
-abst:urzen
-zrutit sa
-82 0 2 163 0
+abstürzen
+zrútiť sa
+82 0 2 163 -1
 0.00000
 
 anlegen
-zalozit, zriadit, obliect
-36 0 3 257 0
+založiť, zriadiť, obliecť
+36 0 3 257 -1
 0.00000
 
 annehmen
-prijat
-30 1 3 289 132
+prijať
+30 1 3 289 -1
 0.30000
 
 anspringen
-napadnut, vyskocit
-25 1 3 144 11
+napadnúť, vyskočiť
+25 1 3 144 -1
 0.14700
 
 antworten
-odpovedat, dat odpoved
-44 4 4 166 537
+odpovedať, dať odpoveď
+44 4 4 166 -1
 0.75990
 
 aufregen
-rozculovat, rozrusovat
-60 0 0 0 0
+rozčulovať, rozrušovať
+60 0 0 0 -1
 0.00000
 
 bald
-skoro, zakratko, onedlho
-80 2 3 169 219
+skoro, zakrátko, onedlho
+80 2 3 169 -1
 0.51000
 
 behandeln
-zaobchadzat, nakladat, jednat
-9 0 7 262 0
+zaobchádzať, nakladať, jednať
+9 0 7 262 -1
 0.00000
 
 dabei
 pri tom, na tom
-7 1 2 89 21
+7 1 2 89 -1
 0.21000
 
 daran
 na tom
-33 1 3 161 28
+33 1 3 161 -1
 0.21000
 
 das Aschenputtel
-popoluska
-8 0 1 183 0
+popoluška
+8 0 1 183 -1
 0.00000
 
 das Fenster
 okno
-18 3 5 269 460
+18 3 5 269 -1
 0.65700
 
 das Halsband
 obojok
-31 1 4 255 49
+31 1 4 255 -1
 0.21000
 
 das Haus
 dom
-3 0 1 7 0
+3 0 1 7 -1
 0.00000
 
 das Land
 zem, pevnina
-21 4 5 163 423
+21 4 5 163 -1
 0.68493
 
-das M:archen
-rozpravka
-2 2 3 219 245
+das Märchen
+rozprávka
+2 2 3 219 -1
 0.51000
 
 das Versteck
-ukryt, skrysa
-74 0 4 115 0
+úkryt, skrýša
+74 0 4 115 -1
 0.00000
 
 der Boden
-poda, zem
-83 1 3 184 70
+pôda, zem
+83 1 3 184 -1
 0.30000
 
-der Bogensch:utze
-lucistnik, lukostrelec
-81 4 6 170 539
+der Bogenschütze
+lučištník, lukostrelec
+81 4 6 170 -1
 0.75990
 
 der Himmel
 obloha, nebo
-55 1 4 221 81
+55 1 4 221 -1
 0.30000
 
 der Junge
 chlapec
-17 3 3 108 362
+17 3 3 108 -1
 0.65700
 
 der Pfiff
 hvizd
-65 2 5 281 242
+65 2 5 281 -1
 0.44700
 
 der Schatten
-tien
-27 0 3 279 0
+tieň
+27 0 3 279 -1
 0.00000
 
 der Staub
 prach
-48 0 4 258 0
+48 0 4 258 -1
 0.00000
 
 der Zorn
-hnev, zlost
-84 0 2 215 0
+hnev, zlosť
+84 0 2 215 -1
 0.00000
 
 die :Uberraschung
 prekvapenie
-49 0 6 252 0
+49 0 6 252 -1
 0.00000
 
 die Aussicht
-vyhlad, pohlad
-62 0 4 207 0
+výhľad, pohľad
+62 0 4 207 -1
 0.00000
 
 die Eichel
-zalud
-32 0 4 275 0
+žaluď
+32 0 4 275 -1
 0.00000
 
 die Fee
-vila
-47 2 2 146 210
+víla
+47 2 2 146 -1
 0.51000
 
 die Freude
-radost, potesenie, veselost
-50 0 3 248 0
+radosť, potešenie, veselosť
+50 0 3 248 -1
 0.00000
 
 die Geschwister
-surodenci
-5 2 4 217 244
+súrodenci
+5 2 4 217 -1
 0.51000
 
 die Hexe
-striga, carodejnica
-78 4 4 153 532
+striga, čarodejnica
+78 4 4 153 -1
 0.75990
 
 die Insel
 ostrov
-59 4 4 82 506
+59 4 4 82 -1
 0.75990
 
 die Kugel
-gula
-66 1 1 178 68
+guľa
+66 1 1 178 -1
 0.30000
 
-die L:ugnerin
-klamarka
-85 0 4 295 0
+die Lügnerin
+klamárka
+85 0 4 295 -1
 0.00000
 
 die Stiefmutter
 macocha
-1 2 6 268 185
+1 2 6 268 -1
 0.40290
 
 die Stimme
 hlas
-10 4 5 121 519
+10 4 5 121 -1
 0.75990
 
 dort
 tam, tamto
-39 2 7 267 286
+39 2 7 267 -1
 0.51000
 
 drauSen
 vonku
-11 0 3 203 0
+11 0 3 203 -1
 0.00000
 
 drehen
-otocit, stocit, krutit
-14 0 2 271 0
+otočiť, stočiť, krútiť
+14 0 2 271 -1
 0.00000
 
-eifers:uchtig
-ziarlivy
-77 0 8 245 0
+eifersüchtig
+žiarlivý
+77 0 8 245 -1
 0.00000
 
 einmal
-jedenkrat, kedysi, niekedy
-6 2 3 225 190
+jedenkrát, kedysi, niekedy
+6 2 3 225 -1
 0.44700
 
 erreichen
-dosiahnut, dosahovat
-79 1 4 238 10
+dosiahnuť, dosahovať
+79 1 4 238 -1
 0.10290
 
 erwidern
-odpovedat, odvedit
-43 0 4 251 0
+odpovedať, odvetiť
+43 0 4 251 -1
 0.00000
 
-erz:ahlen
-rozpravat, vykladat
-40 1 6 255 49
+erzählen
+rozprávať, vykladať
+40 1 6 255 -1
 0.21000
 
 fragen
-spytat sa
-20 2 2 130 204
+spýtať sa
+20 2 2 130 -1
 0.51000
 
 gefallen
-pacit sa
-35 0 4 292 0
+páčiť sa
+35 0 4 292 -1
 0.00000
 
 genieSen
-uzivat si, tesit sa
-63 0 4 263 0
+užívať si, tešiť sa
+63 0 4 263 -1
 0.00000
 
 gerne
-rad, s radostou
-41 1 3 284 124
+rád, s radosťou
+41 1 3 284 -1
 0.30000
 
 glitzern
-ligotat sa
-46 2 3 259 277
+ligotať sa
+46 2 3 259 -1
 0.51000
 
 grausam
-kruty, bezcitny
-12 0 5 250 0
+krutý, bezcitný
+12 0 5 250 -1
 0.00000
 
 hoch
-vysoky
-53 2 2 156 214
+vysoký
+53 2 2 156 -1
 0.51000
 
 knapp
-tesne, nedostacujuci
-67 2 3 276 297
+tesne, nedostačujúci
+67 2 3 276 -1
 0.51000
 
 laut
-hlasity, hlasny
-69 1 2 176 68
+hlasitý, hlasný
+69 1 2 176 -1
 0.30000
 
 leuchten
-svietit ,ziarit
-76 0 2 233 0
+svietiť ,žiariť
+76 0 2 233 -1
 0.00000
 
 mitbringen
-priniest so sebou
-34 2 3 167 218
+priniesť so sebou
+34 2 3 167 -1
 0.51000
 
 mitkommen
-ist spolu, odprevadit
-42 1 3 285 125
+íst spolu, odprevadiť
+42 1 3 285 -1
 0.30000
 
 nehmen
-vziat, zobrat
-28 1 5 254 97
+vziať, zobrať
+28 1 5 254 -1
 0.30000
 
 nimmermehr
-uz nikdy/nikdy viac
-22 1 5 283 123
+už nikdy/nikdy viac
+22 1 5 283 -1
 0.30000
 
 offen
-otvoreny
-23 4 4 140 527
+otvorený
+23 4 4 140 -1
 0.75990
 
-pl:otzlich
-necakany, nahly
-64 1 8 286 69
+plötzlich
+nečakaný, náhly
+64 1 8 286 -1
 0.21000
 
 rufen
-(za)volat
-58 1 3 198 74
-0.30000
+(za)volať
+58 1 4 298 -1
+0.21000
 
 ruhig
-pokohny, tichy, mierny
-4 2 3 236 257
+pokojný, tichý, mierny
+4 2 3 236 -1
 0.51000
 
 schauen
-divas ta, hladiet, pozerat
-56 0 2 270 0
+dívať sa, hľadieť, pozerať
+56 0 2 270 -1
 0.00000
 
 schnappen
-uchmatnut, polapit
-26 1 3 118 56
+uchmatnúť, polapiť
+26 1 3 118 -1
 0.30000
 
 schreien
-kricat, revat, hulakat
-75 2 3 294 341
+kričať, revať, hulákať
+75 2 3 294 -1
 0.51000
 
 schweben
-vznasat sa
-51 0 5 291 0
+vznášať sa
+51 0 5 291 -1
 0.00000
 
 segeln
-plachtit, plavat plachetnicou
-71 2 3 256 274
+plachtiť, plávať plachetnicou
+71 2 3 256 -1
 0.51000
 
 seltsam
-cudny, podivuhodny
-16 0 4 266 0
+čudný, podivuhodný
+16 0 4 266 -1
 0.00000
 
 sogleich
-ihned, okamzite
-52 3 6 159 383
+ihneď, okamžite
+52 3 6 159 -1
 0.65700
 
 springen
-skocit, skakat
-24 1 3 293 80
+skočiť, skákať
+24 1 3 293 -1
 0.21000
 
 sternenklar
-hviezdna, jasna
-54 2 5 213 241
+hviezdna, jasná
+54 2 5 213 -1
 0.51000
 
 umdrehen
-obratit sa, otocit sa
-15 0 5 264 0
+obrátiť sa, otočiť sa
+15 0 6 295 -1
 0.00000
 
 verlieren
-stratit
-38 0 3 278 0
+stratiť
+38 0 3 278 -1
 0.00000
 
 verstreuen
-rozsypat, rozhadzat
-45 0 3 116 0
+rozsypať, rozhádzať
+45 0 3 116 -1
 0.00000
 
 vielleicht
-mozno, azda, hadam, vari
-37 0 0 0 0
+možno, azda, hádam, vari
+37 0 0 0 -1
 0.00000
 
 vorbei
-okolo, vedla
-68 2 3 92 191
+okolo, vedľa
+68 2 3 92 -1
 0.51000
 
-w:utend
-rozzureny, zurivy
-72 0 6 287 0
+wütend
+rozzurený, zúrivý
+72 0 6 287 -1
 0.00000
 
 weil
-pretoze
-73 1 3 138 59
+pretože
+73 1 3 138 -1
 0.30000
 
 wer?
 kto?
-19 2 2 62 183
+19 2 2 62 -1
 0.51000
 
 wieder
-zas, opat, znova
-29 1 5 290 134
+zas, opäť, znova
+29 1 5 290 -1
 0.30000
 
 wundervoll
-corovny, carokrasny
-61 0 1 247 0
+čarovný, čarokrásny
+61 0 1 247 -1
 0.00000
 
 zeigen
-ukazat, ukazovat
-57 0 3 201 0
+ukázať, ukazovať
+57 0 3 201 -1
+0.00000
+
+das Schneewittchen
+snehulienka
+0 0 0 295 -1
+0.00000
+
+der Zwerg
+trpaslík
+0 0 0 295 -1
+0.00000
+
+Die Königin
+kráľovná
+0 0 0 296 -1
+0.00000
+
+sehnlich
+túžobný
+0 0 0 296 -1
+0.00000
+
+die Tochter
+dcéra
+0 0 0 296 -1
+0.00000
+
+wünschen
+želať si
+0 0 0 296 -1
+0.00000
+
+die Lippe
+pera
+0 1 1 296 -1
+0.30000
+
+rot
+červený
+0 0 0 296 -1
+0.00000
+
+das Blut
+krv
+0 0 0 296 -1
+0.00000
+
+die Haut
+koža
+0 0 0 296 -1
+0.00000
+
+weiß
+biely
+0 0 0 296 -1
+0.00000
+
+der Schnee
+sneh
+0 0 0 296 -1
+0.00000
+
+das Haar
+vlas, chlp
+0 0 0 296 -1
+0.00000
+
+der Wunsch
+želanie
+0 0 0 296 -1
+0.00000
+
+die Erfüllung
+splnenie, uskutočnenie
+0 0 0 296 -1
+0.00000
+
+sehr
+veľmi
+0 0 1 297 -1
+0.00000
+
+sterben
+zomrieť
+0 0 0 296 -1
+0.00000
+
+der König
+kráľ
+0 0 0 296 -1
+0.00000
+
+die Wirklichkeit
+skutočnosť
+0 0 0 296 -1
+0.00000
+
+verkleiden
+prestrojiť, maskovať
+0 0 0 296 -1
+0.00000
+
+der Spiegel
+zrkadlo
+0 0 0 296 -1
+0.00000
+
+besitzen
+vlastniť, mať
+0 0 0 296 -1
+0.00000
+
+zufrieden
+spokojný
+0 0 0 296 -1
+0.00000
+
+die Ordnung
+poriadok
+0 0 0 296 -1
+0.00000
+
+wachsen
+rásť
+0 0 0 296 -1
+0.00000
+
+aufwachsen
+vyrásť
+0 0 0 296 -1
+0.00000
+
+das Herz
+srdce
+0 0 0 296 -1
+0.00000
+
+diesmal
+tentokrát, tentoraz
+0 0 0 296 -1
+0.00000
+
+tausendmal
+tisíckrát
+0 0 0 296 -1
+0.00000
+
+rasend
+rýchly, divoký
+0 0 0 296 -1
+0.00000
+
+die Wut
+zúrivosť, zlosť
+0 0 1 298 -1
+0.00000
+
+der Jäger
+poľovník
+0 0 0 299 -1
+0.00000
+
+befehlen
+rozkázať, prikázať
+0 0 0 299 -1
+0.00000
+
+tot
+mŕtvy
+0 0 0 299 -1
+0.00000
+
+der Wald
+les
+0 0 0 299 -1
+0.00000
+
+der Beweis
+dôkaz
+0 0 0 299 -1
+0.00000
+
+gehorchen
+poslúchať
+0 0 0 299 -1
 0.00000
 
