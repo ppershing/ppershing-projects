@@ -11,6 +11,9 @@ class Config:
     POKUSOV = 10
     #
     VOCABLUARY = "de-slovka.dat"
-    #VOCABLUARY = "fr-skola.dat"
+    VOCABLUARY = "fr-skola.dat"
     FAIL_AUTOPLAY = True
     ADD_AUTOPLAY = True
+
+    SHOW_RATING_HISTOGRAM = True
+    SHOW_KNOWLEDGE_HISTOGRAM = False
