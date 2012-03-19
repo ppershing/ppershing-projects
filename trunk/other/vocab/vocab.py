@@ -10,6 +10,7 @@ import speak
 import os.path
 from config import Config
 import utils
+import graphic
 
 class Entry:
     def __init__(self, query, answer):
@@ -43,15 +44,18 @@ class Entry:
     def advanceAge(self, age = 1):
         self.last_try_age += age
 
+    def getKnowledge(self):
+        return self.knowledge_score
+
     def getRating(self):
         base = self.knowledge_score
         exponent = 1.5 + math.sqrt(self.last_try_age) / 15.0
         return math.pow(base, exponent)
 
     def __str__(self):
-        return "%s -> %s (rating %.2f, knowledge %.2f (%d/%d), age: %d)" % (
+        return "%s -> %s (rating %.1f, knowledge %.1f (%d/%d), age: %d)" % (
             self.query, self.answer,
-            self.getRating(), self.knowledge_score,
+            100* self.getRating(), 100 * self.knowledge_score,
             self.tries_ok, self.tries_all, self.last_try_age)
 
 class Vocabluary:
@@ -118,6 +122,9 @@ class Vocabluary:
     def getAverageRating(self):
         return sum(map(lambda x: x.getRating(), self.entries)) / len(self.entries)
 
+    def getMaxRating(self):
+        return max(map(lambda x: x.getRating(), self.entries))
+
     def add(self, entry):
         self.entries.append(entry)
 
@@ -140,33 +147,12 @@ class MagicChooser:
     def getThresholds(cls):
         return [cls.getThreshold(step) for step in range(Config.POKUSOV)]
 
-class Histogram:
-    def __init__(self, width, height, char):
-        self.width = width
-        self.height = height
-        self.char = char
-
-    def printHistogram(self, values, stream):
-        values = [x for x in values] # copy
-        values.sort();
-        values.reverse()
-        data = [ ['.' for y in range(self.height)] for x in range(self.width)]
-        maxval = max(values) + 1e-7
-        for x in range(self.width):
-            sample = int(x * 1.0 / self.width * len(values))
-            for y in range(int(values[sample] * 1.0 / maxval  * self.height)):
-                data[x][y] = self.char
-        for y in range(self.height):
-            for x in range(self.width):
-                stream.write(data[x][self.height - 1 - y])
-            stream.write('\n')
-        return
 
 
 vocab = Vocabluary()
 vocab.loadFromFile(Config.VOCABLUARY)
 
-h = Histogram(80, 10, '*')
+h = graphic.Histogram(80, 10, '*')
 print MagicChooser.getThresholds()
 
 e = None
@@ -176,7 +162,8 @@ while True:
     print
     print
     print
-    print e.getRating(), e.knowledge_score
+    print "Rating: %.1f Score: %.1f" % (
+        100* e.getRating(), 100 * e.knowledge_score)
     print colored(e.query, 'yellow', attrs=['bold'])
     answer = raw_input("Answer:")
 
@@ -234,11 +221,13 @@ while True:
 
 
     print e
-    if utils.fix_accents(answer) == e.answer:
+    answer = utils.fix_accents(answer)
+    if answer == e.answer:
         e.answerWasCorrect()
         print colored(e.answer, 'green', attrs=['bold'])
     else:
         e.answerWasBad()
+        print answer
         print colored(e.answer, 'red', attrs=['bold'])
         if Config.FAIL_AUTOPLAY:
             speak.play('SK', e.query)
@@ -248,5 +237,12 @@ while True:
     vocab.advance()
 
     print
-    print "average rating: %d" % (vocab.getAverageRating() * 1000)
-    h.printHistogram(map(lambda x:x.getRating(), vocab.entries), sys.stdout)
+    print "average rating: %d, max: %d" % (
+        vocab.getAverageRating() * 1000, vocab.getMaxRating() * 1000)
+
+    if Config.SHOW_RATING_HISTOGRAM:
+        h.printHistogram(map(lambda x:x.getRating() * 1000, vocab.entries),
+                         "%03.0f", sys.stdout)
+    if Config.SHOW_KNOWLEDGE_HISTOGRAM:
+        h.printHistogram(map(lambda x:x.getKnowledge(), vocab.entries),
+                         "%1.2f", sys.stdout)
