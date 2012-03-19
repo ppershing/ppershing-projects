@@ -7,18 +7,18 @@ prekvapený
 
 abfeuern
 vystreliť, odpáliť
-70 0 3 246 -1
-0.00000
+70 2 7 534 -1
+0.44700
 
 abstürzen
 zrútiť sa
-82 0 2 163 -1
+82 0 8 526 -1
 0.00000
 
 anlegen
 založiť, zriadiť, obliecť
-36 0 3 257 -1
-0.00000
+36 1 6 354 -1
+0.30000
 
 annehmen
 prijať
@@ -27,8 +27,8 @@ prijať
 
 anspringen
 napadnúť, vyskočiť
-25 1 3 144 -1
-0.14700
+25 2 5 469 -1
+0.37203
 
 antworten
 odpovedať, dať odpoveď
@@ -37,7 +37,7 @@ odpovedať, dať odpoveď
 
 aufregen
 rozčulovať, rozrušovať
-60 0 0 0 -1
+60 0 3 489 -1
 0.00000
 
 bald
@@ -47,23 +47,23 @@ skoro, zakrátko, onedlho
 
 behandeln
 zaobchádzať, nakladať, jednať
-9 0 7 262 -1
-0.00000
+9 1 10 404 -1
+0.30000
 
 dabei
 pri tom, na tom
-7 1 2 89 -1
-0.21000
+7 2 4 447 -1
+0.40290
 
 daran
 na tom
-33 1 3 161 -1
-0.21000
+33 2 4 452 -1
+0.44700
 
 das Aschenputtel
 popoluška
-8 0 1 183 -1
-0.00000
+8 1 5 380 -1
+0.30000
 
 das Fenster
 okno
@@ -72,13 +72,13 @@ okno
 
 das Halsband
 obojok
-31 1 4 255 -1
-0.21000
+31 2 5 476 -1
+0.44700
 
 das Haus
 dom
-3 0 1 7 -1
-0.00000
+3 2 3 496 -1
+0.51000
 
 das Land
 zem, pevnina
@@ -92,13 +92,13 @@ rozprávka
 
 das Versteck
 úkryt, skrýša
-74 0 4 115 -1
+74 0 6 477 -1
 0.00000
 
 der Boden
 pôda, zem
-83 1 3 184 -1
-0.30000
+83 1 4 529 -1
+0.21000
 
 der Bogenschütze
 lučištník, lukostrelec
@@ -107,8 +107,8 @@ lučištník, lukostrelec
 
 der Himmel
 obloha, nebo
-55 1 4 221 -1
-0.30000
+55 1 6 418 -1
+0.14700
 
 der Junge
 chlapec
@@ -122,33 +122,33 @@ hvizd
 
 der Schatten
 tieň
-27 0 3 279 -1
+27 0 5 533 -1
 0.00000
 
 der Staub
 prach
-48 0 4 258 -1
-0.00000
+48 1 6 513 -1
+0.30000
 
 der Zorn
 hnev, zlosť
-84 0 2 215 -1
-0.00000
+84 2 7 527 -1
+0.51000
 
-die :Uberraschung
+die Überraschung
 prekvapenie
-49 0 6 252 -1
+49 0 8 530 -1
 0.00000
 
 die Aussicht
 výhľad, pohľad
-62 0 4 207 -1
-0.00000
+62 1 7 515 -1
+0.30000
 
 die Eichel
 žaluď
-32 0 4 275 -1
-0.00000
+32 2 7 500 -1
+0.51000
 
 die Fee
 víla
@@ -157,7 +157,7 @@ víla
 
 die Freude
 radosť, potešenie, veselosť
-50 0 3 248 -1
+50 0 6 508 -1
 0.00000
 
 die Geschwister
@@ -177,18 +177,18 @@ ostrov
 
 die Kugel
 guľa
-66 1 1 178 -1
-0.30000
+66 2 2 320 -1
+0.51000
 
 die Lügnerin
 klamárka
-85 0 4 295 -1
-0.00000
+85 2 8 480 -1
+0.51000
 
 die Stiefmutter
 macocha
-1 2 6 268 -1
-0.40290
+1 2 7 519 -1
+0.28203
 
 die Stimme
 hlas
@@ -200,25 +200,25 @@ tam, tamto
 39 2 7 267 -1
 0.51000
 
-drauSen
-vonku
-11 0 3 203 -1
-0.00000
+draußen
+vonku, ďaleko od civilizácie
+11 1 8 454 -1
+0.30000
 
 drehen
 otočiť, stočiť, krútiť
-14 0 2 271 -1
-0.00000
+14 1 4 483 -1
+0.30000
 
 eifersüchtig
 žiarlivý
-77 0 8 245 -1
+77 0 11 478 -1
 0.00000
 
 einmal
 jedenkrát, kedysi, niekedy
-6 2 3 225 -1
-0.44700
+6 3 4 386 -1
+0.61290
 
 erreichen
 dosiahnuť, dosahovať
@@ -227,13 +227,13 @@ dosiahnuť, dosahovať
 
 erwidern
 odpovedať, odvetiť
-43 0 4 251 -1
+43 0 9 442 -1
 0.00000
 
 erzählen
 rozprávať, vykladať
-40 1 6 255 -1
-0.21000
+40 1 7 531 -1
+0.14700
 
 fragen
 spýtať sa
@@ -242,18 +242,18 @@ spýtať sa
 
 gefallen
 páčiť sa
-35 0 4 292 -1
+35 0 6 474 -1
 0.00000
 
-genieSen
+genießen
 užívať si, tešiť sa
-63 0 4 263 -1
+63 0 9 503 -1
 0.00000
 
 gerne
 rád, s radosťou
-41 1 3 284 -1
-0.30000
+41 2 5 490 -1
+0.44700
 
 glitzern
 ligotať sa
@@ -267,8 +267,8 @@ krutý, bezcitný
 
 hoch
 vysoký
-53 2 2 156 -1
-0.51000
+53 3 3 417 -1
+0.65700
 
 knapp
 tesne, nedostačujúci
@@ -277,23 +277,23 @@ tesne, nedostačujúci
 
 laut
 hlasitý, hlasný
-69 1 2 176 -1
-0.30000
+69 2 3 352 -1
+0.51000
 
 leuchten
-svietiť ,žiariť
-76 0 2 233 -1
-0.00000
+svietiť, žiariť
+76 1 5 514 -1
+0.30000
 
 mitbringen
 priniesť so sebou
-34 2 3 167 -1
-0.51000
+34 3 4 518 -1
+0.65700
 
 mitkommen
 íst spolu, odprevadiť
-42 1 3 285 -1
-0.30000
+42 2 6 511 -1
+0.31290
 
 nehmen
 vziať, zobrať
@@ -302,8 +302,8 @@ vziať, zobrať
 
 nimmermehr
 už nikdy/nikdy viac
-22 1 5 283 -1
-0.30000
+22 2 7 438 -1
+0.44700
 
 offen
 otvorený
@@ -312,28 +312,28 @@ otvorený
 
 plötzlich
 nečakaný, náhly
-64 1 8 286 -1
-0.21000
+64 2 10 528 -1
+0.40290
 
 rufen
 (za)volať
-58 1 4 298 -1
-0.21000
+58 2 6 389 -1
+0.40290
 
 ruhig
 pokojný, tichý, mierny
-4 2 3 236 -1
-0.51000
+4 3 4 463 -1
+0.65700
 
 schauen
 dívať sa, hľadieť, pozerať
-56 0 2 270 -1
+56 0 3 327 -1
 0.00000
 
 schnappen
 uchmatnúť, polapiť
-26 1 3 118 -1
-0.30000
+26 3 6 424 -1
+0.61290
 
 schreien
 kričať, revať, hulákať
@@ -342,17 +342,17 @@ kričať, revať, hulákať
 
 schweben
 vznášať sa
-51 0 5 291 -1
-0.00000
+51 1 9 522 -1
+0.30000
 
 segeln
 plachtiť, plávať plachetnicou
-71 2 3 256 -1
-0.51000
+71 3 4 428 -1
+0.65700
 
 seltsam
 čudný, podivuhodný
-16 0 4 266 -1
+16 0 6 499 -1
 0.00000
 
 sogleich
@@ -362,8 +362,8 @@ ihneď, okamžite
 
 springen
 skočiť, skákať
-24 1 3 293 -1
-0.21000
+24 2 4 318 -1
+0.44700
 
 sternenklar
 hviezdna, jasná
@@ -372,241 +372,241 @@ hviezdna, jasná
 
 umdrehen
 obrátiť sa, otočiť sa
-15 0 6 295 -1
+15 0 10 502 -1
 0.00000
 
 verlieren
 stratiť
-38 0 3 278 -1
+38 0 5 401 -1
 0.00000
 
 verstreuen
 rozsypať, rozhádzať
-45 0 3 116 -1
+45 0 5 516 -1
 0.00000
 
 vielleicht
 možno, azda, hádam, vari
-37 0 0 0 -1
-0.00000
+37 2 3 440 -1
+0.51000
 
 vorbei
 okolo, vedľa
-68 2 3 92 -1
-0.51000
+68 2 4 465 -1
+0.35700
 
 wütend
 rozzurený, zúrivý
-72 0 6 287 -1
-0.00000
+72 1 7 471 -1
+0.30000
 
 weil
 pretože
-73 1 3 138 -1
-0.30000
+73 1 4 372 -1
+0.21000
 
 wer?
 kto?
-19 2 2 62 -1
-0.51000
+19 2 3 451 -1
+0.35700
 
 wieder
 zas, opäť, znova
-29 1 5 290 -1
-0.30000
+29 1 6 309 -1
+0.21000
 
 wundervoll
 čarovný, čarokrásny
-61 0 1 247 -1
-0.00000
+61 2 4 457 -1
+0.51000
 
 zeigen
 ukázať, ukazovať
-57 0 3 201 -1
-0.00000
+57 1 6 412 -1
+0.30000
 
 das Schneewittchen
 snehulienka
-0 0 0 295 -1
-0.00000
+0 2 3 459 -1
+0.51000
 
 der Zwerg
 trpaslík
-0 0 0 295 -1
-0.00000
+0 1 2 364 -1
+0.30000
 
-Die Königin
+die Königin
 kráľovná
-0 0 0 296 -1
-0.00000
+0 1 3 420 -1
+0.30000
 
 sehnlich
 túžobný
-0 0 0 296 -1
-0.00000
+0 1 4 406 -1
+0.30000
 
 die Tochter
 dcéra
-0 0 0 296 -1
-0.00000
+0 2 2 338 -1
+0.51000
 
 wünschen
 želať si
-0 0 0 296 -1
+0 0 1 415 -1
 0.00000
 
 die Lippe
 pera
-0 1 1 296 -1
-0.30000
+0 2 2 455 -1
+0.51000
 
 rot
 červený
-0 0 0 296 -1
-0.00000
+0 1 1 383 -1
+0.30000
 
 das Blut
 krv
-0 0 0 296 -1
-0.00000
+0 1 4 501 -1
+0.21000
 
 die Haut
 koža
-0 0 0 296 -1
+0 0 2 481 -1
 0.00000
 
 weiß
 biely
-0 0 0 296 -1
-0.00000
+0 2 2 485 -1
+0.51000
 
 der Schnee
 sneh
-0 0 0 296 -1
-0.00000
+0 3 6 403 -1
+0.65700
 
 das Haar
 vlas, chlp
-0 0 0 296 -1
-0.00000
+0 2 3 510 -1
+0.51000
 
 der Wunsch
 želanie
-0 0 0 296 -1
+0 0 4 532 -1
 0.00000
 
 die Erfüllung
 splnenie, uskutočnenie
-0 0 0 296 -1
+0 0 2 504 -1
 0.00000
 
 sehr
 veľmi
-0 0 1 297 -1
+0 0 2 382 -1
 0.00000
 
 sterben
 zomrieť
-0 0 0 296 -1
-0.00000
+0 1 5 521 -1
+0.21000
 
 der König
 kráľ
-0 0 0 296 -1
-0.00000
+0 2 2 523 -1
+0.51000
 
 die Wirklichkeit
 skutočnosť
-0 0 0 296 -1
+0 0 2 363 -1
 0.00000
 
 verkleiden
 prestrojiť, maskovať
-0 0 0 296 -1
+0 0 3 446 -1
 0.00000
 
 der Spiegel
 zrkadlo
-0 0 0 296 -1
-0.00000
+0 1 3 437 -1
+0.30000
 
 besitzen
 vlastniť, mať
-0 0 0 296 -1
-0.00000
+0 2 6 493 -1
+0.51000
 
 zufrieden
 spokojný
-0 0 0 296 -1
+0 0 6 492 -1
 0.00000
 
 die Ordnung
 poriadok
-0 0 0 296 -1
+0 0 1 512 -1
 0.00000
 
 wachsen
 rásť
-0 0 0 296 -1
-0.00000
+0 1 5 422 -1
+0.30000
 
 aufwachsen
 vyrásť
-0 0 0 296 -1
-0.00000
+0 2 4 507 -1
+0.44700
 
 das Herz
 srdce
-0 0 0 296 -1
-0.00000
+0 2 2 343 -1
+0.51000
 
 diesmal
 tentokrát, tentoraz
-0 0 0 296 -1
-0.00000
+0 1 2 525 -1
+0.21000
 
 tausendmal
 tisíckrát
-0 0 0 296 -1
-0.00000
+0 2 2 407 -1
+0.51000
 
 rasend
 rýchly, divoký
-0 0 0 296 -1
+0 0 2 466 -1
 0.00000
 
 die Wut
 zúrivosť, zlosť
-0 0 1 298 -1
-0.00000
+0 2 5 460 -1
+0.51000
 
 der Jäger
 poľovník
-0 0 0 299 -1
-0.00000
+0 2 3 509 -1
+0.51000
 
 befehlen
 rozkázať, prikázať
-0 0 0 299 -1
+0 0 3 524 -1
 0.00000
 
 tot
 mŕtvy
-0 0 0 299 -1
-0.00000
+0 1 1 304 -1
+0.30000
 
 der Wald
 les
-0 0 0 299 -1
-0.00000
+0 2 4 514 -1
+0.51000
 
 der Beweis
 dôkaz
-0 0 0 299 -1
+0 0 4 470 -1
 0.00000
 
 gehorchen
 poslúchať
-0 0 0 299 -1
+0 0 4 464 -1
 0.00000
 

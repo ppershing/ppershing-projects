@@ -1,5 +1,5 @@
 ver.2.0
-141
+167
 cinq
 5
 6 2 2 70 -1
@@ -7,23 +7,23 @@ cinq
 
 deux
 2
-3 0 1 34 -1
-0.00000
+3 2 3 337 -1
+0.51000
 
 dix
 10
-11 1 1 39 -1
-0.30000
+11 2 2 351 -1
+0.51000
 
 dix-huit
 18
-19 1 1 18 -1
-0.30000
+19 2 2 326 -1
+0.51000
 
 dix-neuf
 19
-20 1 1 3 -1
-0.30000
+20 2 2 202 -1
+0.51000
 
 dix-sept
 17
@@ -37,22 +37,22 @@ douze
 
 elle est
 ona je
-26 1 2 43 -1
-0.30000
+26 2 3 188 -1
+0.51000
 
 elle s'appelle
-ona sa vola
-36 0 0 0 -1
-0.00000
+ona sa volá
+36 1 3 235 -1
+0.21000
 
 elles s'appellent
-ony sa volaju
-41 0 2 7 -1
+ony sa volajú
+41 0 3 352 -1
 0.00000
 
 elles sont
-ony su
-31 0 0 0 -1
+ony sú
+31 0 1 226 -1
 0.00000
 
 huit
@@ -62,63 +62,63 @@ huit
 
 il est
 on je
-25 1 2 18 -1
-0.30000
+25 2 3 287 -1
+0.51000
 
 il s'appelle
-on sa vola
-35 1 1 47 -1
-0.30000
+on sa volá
+35 2 2 358 -1
+0.51000
 
 ils s'appellent
-oni sa volaju
-40 0 1 19 -1
+oni sa volajú
+40 0 3 345 -1
 0.00000
 
 ils sont
-oni su
-30 0 4 63 -1
-0.00000
+oni sú
+30 1 6 314 -1
+0.30000
 
 je m'appelle
-ja sa volam
+ja sa volám
 33 1 1 3 -1
 0.30000
 
 je suis
 ja som
-23 1 1 58 -1
-0.30000
+23 2 3 330 -1
+0.44700
 
 l'Allemagne
 Nemecko
-45 1 1 69 -1
-0.30000
+45 1 3 253 -1
+0.14700
 
 l'Espagne
 Španielsko
-46 1 1 21 -1
-0.30000
+46 2 2 147 -1
+0.51000
 
 l'Italie
 Taliansko
-49 1 2 49 -1
-0.30000
+49 1 3 282 -1
+0.21000
 
 la France
 Francúzsko
-48 0 0 0 -1
-0.00000
+48 2 2 290 -1
+0.51000
 
 la bienvenue
 vitajte, štastný príchod
-55 0 2 60 -1
-0.00000
+55 1 4 335 -1
+0.30000
 
 la famme
 manželka
-53 2 2 52 -1
-0.51000
+53 2 3 331 -1
+0.35700
 
 la femme
 žena
@@ -127,18 +127,18 @@ la femme
 
 la politesse
 zdvorilosť, slušnosť
-56 1 1 25 -1
-0.30000
+56 1 4 241 -1
+0.10290
 
 le Japon
 Japonsko
-50 1 1 36 -1
-0.30000
+50 2 2 291 -1
+0.51000
 
 le homme
 muž
-53 1 1 55 -1
-0.30000
+53 2 2 198 -1
+0.51000
 
 le mari
 manžel, muž
@@ -147,18 +147,18 @@ manžel, muž
 
 les États-Unis
 USA
-47 0 1 27 -1
+47 0 3 283 -1
 0.00000
 
 neuf
 9
-10 1 1 68 -1
-0.30000
+10 2 2 369 -1
+0.51000
 
 nous nous appelons
-my sa volame
-38 0 0 0 -1
-0.00000
+my sa voláme
+38 2 5 275 -1
+0.51000
 
 nous sommes
 my sme
@@ -167,48 +167,48 @@ my sme
 
 on est
 niekto je
-27 1 1 5 -1
-0.30000
+27 2 2 122 -1
+0.51000
 
 on s'appelle
-niekto sa vola
+niekto sa volá
 37 1 1 48 -1
 0.30000
 
 onze
 11
-12 0 2 57 -1
-0.00000
+12 2 4 341 -1
+0.51000
 
 quatorze
 14
-15 2 2 53 -1
-0.51000
+15 2 3 346 -1
+0.35700
 
 quatre
 4
-5 1 2 62 -1
-0.30000
+5 2 3 179 -1
+0.51000
 
 qui
 kto
-52 0 0 0 -1
-0.00000
+52 2 3 339 -1
+0.51000
 
 quinze
 15
-16 0 1 59 -1
+16 0 4 327 -1
 0.00000
 
 se savoir
 byť známe, vedieť
-54 1 2 28 -1
-0.30000
+54 1 3 180 -1
+0.21000
 
 seize
 16
-17 2 2 74 -1
-0.51000
+17 3 3 336 -1
+0.65700
 
 sept
 7
@@ -222,28 +222,28 @@ six
 
 treize
 13
-14 0 1 9 -1
-0.00000
+14 1 5 362 -1
+0.30000
 
 trois
 3
-4 1 2 51 -1
-0.30000
+4 2 3 321 -1
+0.51000
 
 tu es
 ty si
-24 0 0 0 -1
-0.00000
+24 2 2 279 -1
+0.51000
 
 tu t'appelles
-ty sa volas
-38 0 3 45 -1
+ty sa voláš
+38 0 5 296 -1
 0.00000
 
 un
 1
-2 1 2 46 -1
-0.30000
+2 2 3 117 -1
+0.51000
 
 vingt
 20
@@ -251,14 +251,14 @@ vingt
 0.30000
 
 vous vous appelez
-vy sa volate
-39 0 1 33 -1
-0.00000
+vy sa voláte
+39 2 5 294 -1
+0.44700
 
 vous êtes
 vy ste
-29 0 1 64 -1
-0.00000
+29 2 4 344 -1
+0.44700
 
 zéro
 0
@@ -271,299 +271,289 @@ zéro
 0.30000
 
 être
-to be
-22 1 2 38 -1
-0.30000
-
-être
 byť
 32 1 1 31 -1
 0.30000
 
 la Colombie
 Kolumbia
-0 0 0 59 -1
-0.00000
+0 1 2 320 -1
+0.30000
 
 la Grèce
 Grécko
-0 0 0 59 -1
-0.00000
+0 1 4 356 -1
+0.30000
 
 le Brésil
 Brazília
-0 0 0 59 -1
-0.00000
+0 1 4 333 -1
+0.30000
 
 le Pakistan
 Pakistan
-0 0 0 59 -1
-0.00000
+0 2 3 363 -1
+0.51000
 
 le Canada
 Kanada
-0 0 0 59 -1
-0.00000
+0 2 3 332 -1
+0.51000
 
 l'Italie
 Taliansko
-0 0 0 59 -1
-0.00000
+0 2 3 283 -1
+0.51000
 
 l'Allemagne
 Nemecko
-0 0 0 59 -1
+0 0 1 368 -1
 0.00000
 
 le Japon
 Japonsko
-0 0 0 59 -1
-0.00000
-
-les Etats-Unis
-USA
-0 0 1 73 -1
-0.00000
+0 2 2 353 -1
+0.51000
 
 l'Iran
 Irán
-0 0 0 59 -1
-0.00000
+0 2 3 227 -1
+0.51000
 
 la Turquie
 Turecko
-0 1 1 72 -1
-0.30000
+0 2 3 304 -1
+0.44700
 
 la Corée
 Kórea
-0 0 0 59 -1
+0 0 1 239 -1
 0.00000
 
 la Suisse
-Svajciarsko
-0 0 0 59 -1
-0.00000
+Švajčiarsko
+0 1 2 371 -1
+0.21000
 
 l'Arménie
-Armensko
-0 0 0 59 -1
+Arménsko
+0 0 2 322 -1
 0.00000
 
 la Grande-Bretagne
-Britania
-0 0 2 75 -1
+Británia
+0 0 3 310 -1
 0.00000
 
 la Hongrie
-Madarsko
-0 0 0 59 -1
-0.00000
+Maďarsko
+0 3 5 325 -1
+0.61290
 
 l'Inde
 India
-0 0 0 59 -1
-0.00000
+0 1 3 293 -1
+0.21000
 
 la Russie
 Rusko
-0 0 1 59 -1
-0.00000
+0 2 3 359 -1
+0.51000
 
 l'Ukraine
 Ukraina
-0 0 0 59 -1
-0.00000
+0 1 2 256 -1
+0.30000
 
 la Chine
-Cina
-0 0 0 59 -1
-0.00000
+Čína
+0 1 3 224 -1
+0.30000
 
 l'Espagne
-Spanielsko
-0 1 1 66 -1
-0.30000
+Španielsko
+0 1 2 131 -1
+0.21000
 
 la Serbie
 Srbsko
-0 0 0 59 -1
-0.00000
+0 2 4 289 -1
+0.44700
 
 le Vietnam
 Vietnam
-0 0 0 59 -1
-0.00000
-
-la Pologne
-Polsko
-0 1 1 67 -1
+0 1 1 197 -1
 0.30000
 
-français(e)
-francúz(ka)
-0 0 0 75 -1
+la Pologne
+Poľsko
+0 2 2 308 -1
+0.51000
+
+français(-e)
+francúz(-ka)
+0 1 1 95 -1
+0.30000
+
+polonais(-e)
+poliak(poľka)
+0 2 3 250 -1
+0.51000
+
+hongrois(-e)
+maďar(-ka)
+0 1 2 360 -1
+0.30000
+
+japonais(-e)
+japonec(-ka)
+0 1 1 123 -1
+0.30000
+
+pakistanais(-e)
+pakistanec(-ka)
+0 1 4 267 -1
+0.30000
+
+chinois(-e)
+číňan(-ka)
+0 2 2 347 -1
+0.51000
+
+allemand(-e)
+nemec(-ka)
+0 1 3 205 -1
+0.30000
+
+americain(-e)
+američan(-ka)
+0 0 1 303 -1
 0.00000
 
-polonais(e)
-poliak(polka)
-0 0 0 75 -1
-0.00000
+indien(-ne)
+ind(-ka)
+0 3 3 309 -1
+0.65700
 
-hungrois(e)
-madar(ka)
-0 0 0 75 -1
-0.00000
+italien(-ne)
+talian(-ka)
+0 1 2 175 -1
+0.30000
 
-japonais(e)
-japonec(ka)
-0 0 0 75 -1
-0.00000
+colombien(-ne)
+kolumbijčan(-ka)
+0 2 2 209 -1
+0.51000
 
-pakistanais(e)
-pakistanec(ka)
-0 0 0 75 -1
-0.00000
+vietnamien(-ne)
+vietnamčan(-ka)
+0 2 4 240 -1
+0.51000
 
-chinois(e)
-cinan(ka)
-0 0 0 75 -1
-0.00000
+brésilien(-ne)
+brazílčan(-ka)
+0 2 3 281 -1
+0.51000
 
-allemand(e)
-nemec(ka)
-0 0 0 75 -1
-0.00000
+coréen(-ne)
+kórejčan(-ka)
+0 1 2 125 -1
+0.30000
 
-americain(e)
-ameracin(ka)
-0 0 0 75 -1
-0.00000
+suisse(-)
+švajčiar(-ka)
+0 2 2 318 -1
+0.51000
 
-indien(ne)
-ind(ka)
-0 0 0 75 -1
-0.00000
+serbe(-)
+srb(-ka)
+0 1 2 218 -1
+0.30000
 
-italien(ne)
-talian(ka)
-0 0 0 75 -1
-0.00000
+russe(-)
+rus(-ka)
+0 2 2 370 -1
+0.51000
 
-colombien(ne)
-kolumbijcan(ka)
-0 0 0 75 -1
-0.00000
+slovaque(-)
+slovák(-enka)
+0 2 2 229 -1
+0.51000
 
-viernamien(ne)
-vietnamcan(ka)
-0 0 1 75 -1
-0.00000
-
-brésilien(ne)
-brazilcan(ka)
-0 0 0 75 -1
-0.00000
-
-coréen(ne)
-korejcan(ka)
-0 0 0 75 -1
-0.00000
-
-suisse()
-svajciar(ka)
-0 0 0 75 -1
-0.00000
-
-serbe()
-srb(ka)
-0 0 0 75 -1
-0.00000
-
-russe()
-rus(ka)
-0 0 0 75 -1
-0.00000
-
-slovaque()
-slovak(enka)
-0 0 0 75 -1
-0.00000
-
-espagnol(e)
-spaniel(ka)
-0 0 0 75 -1
-0.00000
+espagnol(-e)
+španiel(-ka)
+0 2 2 273 -1
+0.51000
 
 turc(turque)
-turek(turecanka)
-0 0 0 75 -1
-0.00000
+turek(turečanka)
+0 1 1 102 -1
+0.30000
 
-grec(que)
-grék(ka)
-0 0 0 75 -1
-0.00000
+grec(-que)
+grék(-ka)
+0 2 3 302 -1
+0.51000
 
 vingt et un
 21
-0 0 0 75 -1
-0.00000
+0 1 1 268 -1
+0.30000
 
 vingt-deux
 22
-0 0 0 75 -1
-0.00000
+0 1 3 284 -1
+0.30000
 
 vingt-neuf
 29
-0 0 0 75 -1
-0.00000
+0 2 2 312 -1
+0.51000
 
 trente
 30
-0 0 0 75 -1
-0.00000
+0 1 1 208 -1
+0.30000
 
 quarante
 40
-0 0 0 75 -1
-0.00000
+0 1 3 288 -1
+0.30000
 
 cinquante
 50
-0 0 0 75 -1
-0.00000
+0 1 1 366 -1
+0.30000
 
 soixante
 60
-0 0 0 75 -1
-0.00000
+0 1 2 350 -1
+0.21000
 
 soixante-dix
 70
-0 0 0 75 -1
-0.00000
+0 2 2 174 -1
+0.51000
 
 soixante et onze
 71
-0 0 0 75 -1
-0.00000
+0 1 3 265 -1
+0.30000
 
-souzante et un
+soixante et un
 61
-0 0 0 75 -1
-0.00000
+0 1 2 247 -1
+0.30000
 
-souxante-douze
+soixante-douze
 72
-0 0 0 75 -1
+0 0 2 334 -1
 0.00000
 
 soixante-deux
 62
-0 0 0 75 -1
-0.00000
+0 1 3 299 -1
+0.30000
 
 quatre-vingts
 80
@@ -572,136 +562,276 @@ quatre-vingts
 
 quatre-vingt-un
 81
-0 0 0 75 -1
-0.00000
+0 2 3 255 -1
+0.51000
 
 quatre-vingt-deux
 82
-0 0 0 75 -1
-0.00000
+0 1 2 298 -1
+0.21000
 
 quatre-vingt-dix
 90
-0 0 0 75 -1
-0.00000
+0 1 1 148 -1
+0.30000
 
 quatre-vingt-onze
 91
-0 0 0 75 -1
-0.00000
+0 3 3 343 -1
+0.65700
 
 quatre-vingt-douze
 92
-0 0 0 75 -1
-0.00000
+0 2 2 280 -1
+0.51000
 
 cent
 100
-0 0 0 75 -1
-0.00000
+0 2 2 301 -1
+0.51000
 
 cent un
 101
-0 0 0 75 -1
-0.00000
+0 2 3 342 -1
+0.44700
 
 mille
 1000
-0 0 0 75 -1
-0.00000
+0 1 2 306 -1
+0.30000
 
 dix mille
 10000
-0 0 0 75 -1
-0.00000
+0 2 2 319 -1
+0.51000
 
 cent mille
 10^5
-0 0 0 75 -1
-0.00000
+0 2 4 340 -1
+0.31290
 
 un million
 10^6
-0 0 0 75 -1
-0.00000
+0 2 3 297 -1
+0.51000
 
 un milliard
 10^9
-0 0 0 75 -1
-0.00000
+0 2 3 300 -1
+0.51000
 
 directeur(directrice)
-riaditel(ka)
-0 0 0 75 -1
-0.00000
+riaditeľ(-ka)
+0 2 3 338 -1
+0.51000
 
-dentiste()
-zubar(ka)
-0 0 0 75 -1
-0.00000
+dentiste(-)
+zubár(-ka)
+0 2 2 311 -1
+0.51000
 
-photographe()
-fotograf(ka)
-0 0 0 75 -1
-0.00000
+photographe(-)
+fotograf(-ka)
+0 2 2 177 -1
+0.51000
 
-secrétaire()
-sekretar(ka)
-0 0 0 75 -1
-0.00000
+secrétaire(-)
+sekretár(-ka)
+0 1 1 89 -1
+0.30000
 
-professeur()
-profesor(ka)
-0 0 0 75 -1
-0.00000
+professeur(-)
+profesor(-ka)
+0 2 4 328 -1
+0.51000
 
-assistant(e)
-asistant(ka)
-0 0 0 75 -1
-0.00000
+assistant(-e)
+asistant(-ka)
+0 2 3 348 -1
+0.51000
 
 le prénom
 krstné meno
-0 0 0 75 -1
-0.00000
+0 1 2 88 -1
+0.30000
 
 Quel est votre nom et prénom?
 Aké je tvoje meno a priezvisko?
-0 0 0 75 -1
-0.00000
+0 2 3 285 -1
+0.51000
 
 Quelle est votre nationalité?
 Aká je tvoja národnosť?
-0 0 0 75 -1
-0.00000
+0 1 3 315 -1
+0.30000
 
-célibataire()
-slobodný(ná)
-0 0 0 75 -1
-0.00000
+célibataire(-)
+slobodný(-ná)
+0 2 2 324 -1
+0.51000
 
 la naissance
 narodenie
-0 0 0 75 -1
-0.00000
+0 1 4 252 -1
+0.30000
 
 le lieu
 miesto
-0 0 0 75 -1
-0.00000
+0 1 3 271 -1
+0.30000
 
-né(e)
-narodený(ná)
-0 0 0 75 -1
-0.00000
+né(-e)
+narodený(-ná)
+0 1 2 313 -1
+0.30000
 
-marié(e)
-zenaty(ta)
-0 0 0 75 -1
-0.00000
+marié(-e)
+ženatý(-tá)
+0 2 2 295 -1
+0.51000
 
 la chimie
 chémia
+0 1 2 349 -1
+0.21000
+
+aller
+ísť, chodiť
+0 1 2 270 -1
+0.21000
+
+je vais
+ja idem
+0 1 1 83 -1
+0.30000
+
+tu vas
+ty ideš
+0 1 2 260 -1
+0.30000
+
+il va
+on ide
+0 1 5 196 -1
+0.30000
+
+elle va
+ona ide
 0 0 0 75 -1
+0.00000
+
+nous allons
+my ideme
+0 0 1 350 -1
+0.00000
+
+vous allez
+vy idete
+0 1 1 92 -1
+0.30000
+
+ils vont
+oni idú
+0 2 3 214 -1
+0.51000
+
+avoir
+mať, vlastniť
+0 2 3 305 -1
+0.51000
+
+j'ai
+ja mám
+0 2 2 364 -1
+0.51000
+
+tu as
+ty máš
+0 1 5 317 -1
+0.21000
+
+il a
+on má
+0 0 1 213 -1
+0.00000
+
+nous avons
+my máme
+0 1 3 361 -1
+0.30000
+
+vous avez
+vy máte
+0 0 3 355 -1
+0.00000
+
+ils ont
+oni majú
+0 1 3 316 -1
+0.30000
+
+travailler
+pracovať
+0 2 3 242 -1
+0.51000
+
+manger
+jesť
+0 2 2 274 -1
+0.51000
+
+ami(-e)
+priateľ(-ka)
+0 0 0 350 -1
+0.00000
+
+le âge
+vek
+0 1 2 365 -1
+0.30000
+
+le numéro
+číslo
+0 0 0 350 -1
+0.00000
+
+la adresse
+adresa
+0 1 1 367 -1
+0.30000
+
+le hôtel
+hotel
+0 0 0 350 -1
+0.00000
+
+la chambre
+izba, miestnosť
+0 0 0 350 -1
+0.00000
+
+la clé
+kľúč
+0 0 0 350 -1
+0.00000
+
+le cahier
+zošit
+0 0 0 371 -1
+0.00000
+
+le crayon
+ceruzka
+0 0 0 371 -1
+0.00000
+
+le stylo
+(plniace) pero
+0 0 0 371 -1
+0.00000
+
+la gomme
+guma
+0 0 0 371 -1
 0.00000
 
