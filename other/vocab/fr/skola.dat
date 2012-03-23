@@ -1,40 +1,5 @@
 ver.2.0
-184
-cinq
-5
-6 3 3 426 -1
-0.65700
-
-deux
-2
-3 3 4 491 -1
-0.65700
-
-dix
-10
-11 2 2 351 -1
-0.51000
-
-dix-huit
-18
-19 2 3 523 -1
-0.35700
-
-dix-neuf
-19
-20 3 3 526 -1
-0.65700
-
-dix-sept
-17
-18 2 2 490 -1
-0.51000
-
-douze
-12
-13 2 2 419 -1
-0.51000
-
+104
 elle est
 ona je
 26 2 3 188 -1
@@ -54,11 +19,6 @@ elles sont
 ony sú
 31 0 1 226 -1
 0.00000
-
-huit
-8
-9 3 3 432 -1
-0.65700
 
 il est
 on je
@@ -90,24 +50,9 @@ ja som
 23 2 3 330 -1
 0.44700
 
-l'Allemagne
-Nemecko
-45 2 4 481 -1
-0.40290
-
 l'Espagne
 Španielsko
 46 2 2 147 -1
-0.51000
-
-l'Italie
-Taliansko
-49 2 4 373 -1
-0.44700
-
-la France
-Francúzsko
-48 2 2 290 -1
 0.51000
 
 la bienvenue
@@ -130,11 +75,6 @@ zdvorilosť, slušnosť
 56 2 5 485 -1
 0.37203
 
-le Japon
-Japonsko
-50 2 2 291 -1
-0.51000
-
 le homme
 muž
 53 3 3 395 -1
@@ -144,16 +84,6 @@ le mari
 manžel, muž
 51 1 2 441 -1
 0.30000
-
-les États-Unis
-USA
-47 1 5 382 -1
-0.30000
-
-neuf
-9
-10 3 3 508 -1
-0.65700
 
 nous nous appelons
 my sa voláme
@@ -175,29 +105,14 @@ niekto sa volá
 37 1 1 48 -1
 0.30000
 
-onze
-11
-12 2 4 341 -1
-0.51000
-
 quatorze
 14
 15 2 4 545 -1
 0.24990
 
-quatre
-4
-5 2 3 179 -1
-0.51000
-
 qui
 kto
 52 3 4 497 -1
-0.65700
-
-quinze
-15
-16 3 7 538 -1
 0.65700
 
 se savoir
@@ -210,26 +125,6 @@ seize
 17 3 3 336 -1
 0.65700
 
-sept
-7
-8 2 2 398 -1
-0.51000
-
-six
-6
-7 2 3 404 -1
-0.44700
-
-treize
-13
-14 2 7 489 -1
-0.44700
-
-trois
-3
-4 3 4 492 -1
-0.65700
-
 tu es
 ty si
 24 2 2 279 -1
@@ -239,11 +134,6 @@ tu t'appelles
 ty sa voláš
 38 1 6 532 -1
 0.30000
-
-un
-1
-2 3 4 415 -1
-0.65700
 
 vingt
 20
@@ -260,11 +150,6 @@ vy ste
 29 2 4 344 -1
 0.44700
 
-zéro
-0
-1 2 2 380 -1
-0.51000
-
 étudiant(-e)
 študent(-ka)
 44 2 3 459 -1
@@ -275,99 +160,24 @@ byť
 32 2 2 457 -1
 0.51000
 
-la Colombie
-Kolumbia
-0 2 3 378 -1
-0.51000
-
-la Grèce
-Grécko
-0 1 5 500 -1
-0.21000
-
-le Brésil
-Brazília
-0 2 5 375 -1
-0.51000
-
-le Pakistan
-Pakistan
-0 3 4 529 -1
-0.65700
-
-le Canada
-Kanada
-0 2 3 332 -1
-0.51000
-
-l'Italie
-Taliansko
-0 2 3 283 -1
-0.51000
-
-l'Allemagne
-Nemecko
-0 2 3 456 -1
-0.51000
-
 le Japon
 Japonsko
 0 3 3 411 -1
 0.65700
-
-l'Iran
-Irán
-0 3 4 437 -1
-0.65700
-
-la Turquie
-Turecko
-0 2 3 304 -1
-0.44700
 
 la Corée
 Kórea
 0 2 3 416 -1
 0.51000
 
-la Suisse
-Švajčiarsko
-0 3 5 519 -1
-0.58203
-
-l'Arménie
-Arménsko
-0 0 3 448 -1
-0.00000
-
-la Grande-Bretagne
-Británia
-0 0 5 449 -1
-0.00000
-
 la Hongrie
 Maďarsko
 0 3 5 325 -1
 0.61290
 
-l'Inde
-India
-0 1 4 470 -1
-0.14700
-
 la Russie
 Rusko
 0 2 3 359 -1
-0.51000
-
-l'Ukraine
-Ukraina
-0 1 2 256 -1
-0.30000
-
-la Chine
-Čína
-0 2 4 420 -1
 0.51000
 
 l'Espagne
@@ -375,129 +185,14 @@ l'Espagne
 0 3 4 534 -1
 0.61290
 
-la Serbie
-Srbsko
-0 3 5 408 -1
-0.61290
-
-le Vietnam
-Vietnam
-0 2 2 464 -1
-0.51000
-
-la Pologne
-Poľsko
-0 2 2 308 -1
-0.51000
-
-français(-e)
-francúz(-ka)
-0 2 2 372 -1
-0.51000
-
-polonais(-e)
-poliak(poľka)
-0 2 4 487 -1
-0.35700
-
-hongrois(-e)
-maďar(-ka)
-0 2 3 383 -1
-0.51000
-
-japonais(-e)
-japonec(-ka)
-0 2 2 531 -1
-0.51000
-
-pakistanais(-e)
-pakistanec(-ka)
-0 2 5 436 -1
-0.51000
-
-chinois(-e)
-číňan(-ka)
-0 3 3 502 -1
-0.65700
-
 allemand(-e)
 nemec(-ka)
 0 1 4 521 -1
 0.21000
 
-americain(-e)
-američan(-ka)
-0 1 3 488 -1
-0.30000
-
-indien(-ne)
-ind(-ka)
-0 3 3 309 -1
-0.65700
-
-italien(-ne)
-talian(-ka)
-0 3 4 537 -1
-0.65700
-
-colombien(-ne)
-kolumbijčan(-ka)
-0 3 3 403 -1
-0.65700
-
-vietnamien(-ne)
-vietnamčan(-ka)
-0 3 5 455 -1
-0.65700
-
-brésilien(-ne)
-brazílčan(-ka)
-0 2 3 281 -1
-0.51000
-
-coréen(-ne)
-kórejčan(-ka)
-0 1 2 125 -1
-0.30000
-
-suisse(-)
-švajčiar(-ka)
-0 2 2 318 -1
-0.51000
-
 serbe(-)
 srb(-ka)
 0 2 3 477 -1
-0.51000
-
-russe(-)
-rus(-ka)
-0 2 2 370 -1
-0.51000
-
-slovaque(-)
-slovák(-enka)
-0 2 2 229 -1
-0.51000
-
-espagnol(-e)
-španiel(-ka)
-0 2 2 273 -1
-0.51000
-
-turc(turque)
-turek(turečanka)
-0 2 2 385 -1
-0.51000
-
-grec(-que)
-grék(-ka)
-0 2 3 302 -1
-0.51000
-
-vingt et un
-21
-0 2 2 424 -1
 0.51000
 
 vingt-deux
@@ -510,114 +205,19 @@ vingt-neuf
 0 3 3 446 -1
 0.65700
 
-trente
-30
-0 2 2 451 -1
-0.51000
-
-quarante
-40
-0 1 3 288 -1
-0.30000
-
-cinquante
-50
-0 3 3 515 -1
-0.65700
-
-soixante
-60
-0 2 4 412 -1
-0.40290
-
-soixante-dix
-70
-0 4 4 518 -1
-0.75990
-
-soixante et onze
-71
-0 1 5 525 -1
-0.14700
-
-soixante et un
-61
-0 2 3 499 -1
-0.51000
-
-soixante-douze
-72
-0 1 3 438 -1
-0.30000
-
-soixante-deux
-62
-0 3 5 506 -1
-0.65700
-
-quatre-vingts
-80
-0 0 1 527 -1
-0.00000
-
-quatre-vingt-un
-81
-0 2 4 504 -1
-0.35700
-
-quatre-vingt-deux
-82
-0 3 4 509 -1
-0.61290
-
-quatre-vingt-dix
-90
-0 1 3 511 -1
-0.14700
-
-quatre-vingt-onze
-91
-0 3 4 513 -1
-0.45990
-
-quatre-vingt-douze
-92
-0 2 2 280 -1
-0.51000
-
-cent
-100
-0 2 2 301 -1
-0.51000
-
 cent un
 101
 0 3 4 458 -1
 0.61290
-
-mille
-1000
-0 1 2 306 -1
-0.30000
 
 dix mille
 10000
 0 2 2 319 -1
 0.51000
 
-cent mille
-10^5
-0 2 4 340 -1
-0.31290
-
 un million
 10^6
 0 3 4 486 -1
-0.65700
-
-un milliard
-10^9
-0 3 4 493 -1
 0.65700
 
 directeur(directrice)
