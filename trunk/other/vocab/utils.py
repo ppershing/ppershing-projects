@@ -18,7 +18,7 @@ def fix_accents(text):
          [",u", "ú"],
          [",y", "ý"],
 
-         [",E", "é"],
+         [",E", "É"],
 
          [",r", "ŕ"],
          [",l", "ĺ"],
@@ -55,6 +55,7 @@ def fix_accents(text):
          ["SS", "ß"],
          ["+c" ,"ç"],
          ["+C" ,"Ç"],
+         ["o|e", "œ"], #
     ]
     for entry in ACCENT_REPLACE:
         text = text.replace(entry[0], entry[1])

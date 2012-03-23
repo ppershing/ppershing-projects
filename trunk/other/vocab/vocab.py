@@ -59,18 +59,30 @@ class Entry:
             self.tries_ok, self.tries_all, self.last_try_age)
 
 class Vocabluary:
-    def __init__(self):
+    def __init__(self, lang):
         self.entries = []
         self.epoch = 0
-        self.lang = ""
+        self.lang = lang
+        self.dictionaries = {}
+        self.default_dict = ""
+
+    def getFileName(self, dictname):
+        return self.lang + '/' + dictname + '.dat'
+
+    def addDict(self, dictname, train):
+        if not self.default_dict:
+            self.default_dict = dictname
+        entries = self.loadFromFile(self.getFileName(dictname))
+        self.dictionaries[dictname] = entries
+        if train:
+            self.entries += entries
 
     def loadFromFile(self, filename):
         f = open(filename, 'r')
         version = f.readline().strip()
         assert version == "ver.2.0"
         sloviek = int(f.readline())
-        self.entries = []
-        self.epoch = 0
+        entries = []
         for i in range(sloviek):
             en = f.readline().strip()
             sk = f.readline().strip()
@@ -90,18 +102,21 @@ class Vocabluary:
             e.knowledge_score = hist
             e.last_try_age = -last
             self.epoch = max([self.epoch, last])
-            self.entries.append(e)
-        for e in self.entries:
+            entries.append(e)
+        for e in entries:
             e.advanceAge(self.epoch)
-        print "loaded %d entries" % sloviek
-        self.lang = os.path.basename(filename)[0:2]
-        print "Language: %s" % self.lang
+        print "loaded %d entries from %s" % (sloviek, filename)
+        return entries
 
-    def saveToFile(self, filename):
+    def save(self):
+        for key in self.dictionaries:
+            self.saveToFile(self.getFileName(key), self.dictionaries[key])
+
+    def saveToFile(self, filename, entries):
         f = open(filename, 'w')
         print >>f, "ver.2.0"
-        print >>f, len(self.entries)
-        for entry in self.entries:
+        print >>f, len(entries)
+        for entry in entries:
             print >>f, entry.answer
             print >>f, entry.query
             print >>f, entry.id, entry.tries_ok, entry.tries_all, \
@@ -127,6 +142,14 @@ class Vocabluary:
 
     def add(self, entry):
         self.entries.append(entry)
+        self.dictionaries[self.default_dict].append(entry)
+
+    def move(self, entry, dictionary):
+        assert dictionary in self.dictionaries
+        for d in self.dictionaries:
+            if entry in self.dictionaries[d]:
+                self.dictionaries[d].remove(entry)
+        self.dictionaries[dictionary].append(entry)
 
 class MagicChooser:
     @classmethod
@@ -147,10 +170,11 @@ class MagicChooser:
     def getThresholds(cls):
         return [cls.getThreshold(step) for step in range(Config.POKUSOV)]
 
+    
 
-
-vocab = Vocabluary()
-vocab.loadFromFile(Config.VOCABLUARY)
+vocab = Vocabluary(Config.LANG)
+for f in Config.VOCABLUARY_FILES:
+    vocab.addDict(f, f in Config.VOCABLUARY_TRAIN)
 
 h = graphic.Histogram(80, 10, '*')
 print MagicChooser.getThresholds()
@@ -173,13 +197,14 @@ while True:
     CMD_SAVE_EXIT = "/wq"
     CMD_ADD = "/add/"
     CMD_SEARCH = "/s/"
-    if len(answer) > 1 and answer[0]=='/':
+    CMD_MOVE = "/mv/"
+    if len(answer) > 0 and answer[0]=='/':
         if (answer == CMD_SAVE):
             print "saving..."
-            vocab.saveToFile(Config.VOCABLUARY)
+            vocab.save()
         elif (answer == CMD_SAVE_EXIT):
             print "exitting..."
-            vocab.saveToFile(Config.VOCABLUARY)
+            vocab.save()
             sys.exit()
         elif (answer == CMD_EXIT):
             print "exitting..."
@@ -214,6 +239,13 @@ while True:
                 if x.answer.find(text) != -1:
                     print x
             print "EOF"
+        elif (answer[0:len(CMD_MOVE)] == CMD_MOVE):
+            d = answer[len(CMD_MOVE):]
+            if d in vocab.dictionaries:
+                vocab.move(e, d)
+                print colored('moved...', 'green')
+            else:
+                print colored("no such dictionary!", 'red')
         else:
             print "unknown command"
         e = old_e # go back
@@ -230,7 +262,7 @@ while True:
         print answer
         print colored(e.answer, 'red', attrs=['bold'])
         if Config.FAIL_AUTOPLAY:
-            speak.play('SK', e.query)
+            speak.play(Config.NATIVE_LANG, e.query)
             speak.play(vocab.lang, e.answer)
         time.sleep(1)
     
