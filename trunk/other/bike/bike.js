@@ -2,6 +2,7 @@
  (c) original file from: http://www.ridefreebikemaps.com/
  (c) PPershing (heavy edits)
  */
+
 var map;
 var directions = new google.maps.DirectionsService;
 var elevation = new google.maps.ElevationService;
@@ -9,12 +10,9 @@ google.load("visualization", "1", {
     packages: ["columnchart"]
 });
 var directions_result;
-var panelDirections;
 var polygon_container = [];
 var marker_container = [];
-var ModeSpecificControls, small_mode_control, small_mode_drop_control, mode_control, LeftPanelButtons, RightPanelButtons, clckTimeOut = null,
-    dragtimeout = null,
-    infowindow, panelReDirectionsContainer = [],
+var ModeSpecificControls, mode_control, clckTimeOut = null,
     travelMode = google.maps.DirectionsTravelMode.DRIVING,
     results_container = [],
     polyline_container = [],
@@ -25,20 +23,29 @@ var ModeSpecificControls, small_mode_control, small_mode_drop_control, mode_cont
     al2 = null,
     divisionVerticies = [];
 
-function initializeMap() {
-    var MAP_SETTINGS = {
+var CONFIG = {
+    MAP_SETTINGS : {
         zoom: 8,
         center: new google.maps.LatLng(46.6, 7.7),
         mapTypeId: google.maps.MapTypeId.HYBRID
-    };
-    map = new google.maps.Map(document.getElementById("map_canvas"), MAP_SETTINGS);
-    google.maps.event.addListener(map, "click", function (a) {
-        mapClick(a.latLng)
-    })
+    },
+};
+
+var ELEMENTS = {
+    travelModeSelect: document.getElementById("travel_mode_select"),
+    mapCanvas: document.getElementById("map_canvas"),
+    elevationChart: document.getElementById("elevation_chart"),
+    slopeChart: document.getElementById("slope_chart"),
+    totalDistance: document.getElementById("total_distance"),
+}
+
+function initializeMap() {
+    map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
+    google.maps.event.addListener(map, "click", mapClick);
 }
 
 function updateTravelMode() {
-    switch (document.getElementById("travel_mode_select").selectedIndex) {
+    switch (ELEMENTS.travelModeSelect.selectedIndex) {
         case 0: travelMode = google.maps.DirectionsTravelMode.WALKING
                 break;
         case 1: travelMode = google.maps.DirectionsTravelMode.DRIVING
@@ -48,13 +55,17 @@ function updateTravelMode() {
 
 function initializeUI() {
     mode_control = new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
-    google.maps.event.addDomListener(document.getElementById("travel_mode_select"), "change", updateTravelMode);
-    al = new rfbm.areaLine(document.getElementById("elevation_chart"));
-    al2 = new google.visualization.ColumnChart(document.getElementById("slope_chart"));
+    google.maps.event.addDomListener(ELEMENTS.travelModeSelect, "change", updateTravelMode);
+    al = new rfbm.areaLine(ELEMENTS.elevationChart);
+    al2 = new google.visualization.ColumnChart(ELEMENTS.slopeChart);
     updateTravelMode();
 }
-function findDistance(a, b) {
-    return Math.sqrt(Math.pow(b.lat() - a.lat(), 2) + Math.pow(b.lng() - a.lng(), 2))
+
+function findDistance(latLng1, latLng2) {
+    return Math.sqrt(
+        Math.pow(latLng1.lat() - latLng2.lat(), 2) + 
+        Math.pow(latLng1.lng() - latLng2.lng(), 2)
+    );
 }
 
 function directionsLoaded() {
@@ -79,9 +90,10 @@ function directionsLoaded() {
         divisionVerticies.push(vertex);
     });
     for (b = a = 0; b < polyline_container.length; b++) b in polyline_container && (a += polyline_container[b].distance);
-    document.getElementById("total_distance").innerHTML = "Distance: " + Math.round(a) + " km";
-    directionsQue.length ? window.setTimeout(directionsQueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && (initElevation(), redrawStaticMaps())
+    ELEMENTS.totalDistance.innerHTML = "Distance: " + Math.round(a) + " km";
+    directionsQue.length ? window.setTimeout(directionsQueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && initElevation()
 }
+
 function directionsResultLatLngs(a) {
     var b = [];
     for (x = 0; x < a.routes[0].legs[0].steps.length; x++) {
@@ -92,11 +104,11 @@ function directionsResultLatLngs(a) {
 }
 function mapClick(a) {
     clckTimeOut ? (window.clearTimeout(clckTimeOut), clckTimeOut = null) : clckTimeOut = window.setTimeout(function () {
-        plotRoute(a)
+        addMarker(a.latLng)
     }, 275)
 }
 
-function plotRoute(position) {
+function addMarker(position) {
     var b, c;
     window.clearTimeout(clckTimeOut);
     clckTimeOut = null;
