@@ -4,19 +4,18 @@
  */
 
 var map;
-var directions = new google.maps.DirectionsService;
-var elevation = new google.maps.ElevationService;
+var directionsService = new google.maps.DirectionsService;
+var elevationService = new google.maps.ElevationService;
 google.load("visualization", "1", {
     packages: ["columnchart"]
 });
-var directions_result;
 var polygon_container = [];
 var marker_container = [];
 var ModeSpecificControls, mode_control, clckTimeOut = null,
     travelMode = google.maps.DirectionsTravelMode.DRIVING,
     results_container = [],
     polyline_container = [],
-    directionsQue = [],
+    directionsQueue = [],
     mousemarker = null,
     chart = null,
     al = null,
@@ -39,11 +38,6 @@ var ELEMENTS = {
     totalDistance: document.getElementById("total_distance"),
 }
 
-function initializeMap() {
-    map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
-    google.maps.event.addListener(map, "click", mapClick);
-}
-
 function updateTravelMode() {
     switch (ELEMENTS.travelModeSelect.selectedIndex) {
         case 0: travelMode = google.maps.DirectionsTravelMode.WALKING
@@ -54,6 +48,9 @@ function updateTravelMode() {
 }
 
 function initializeUI() {
+    map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
+    google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng);});
+
     mode_control = new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
     google.maps.event.addDomListener(ELEMENTS.travelModeSelect, "change", updateTravelMode);
     al = new rfbm.areaLine(ELEMENTS.elevationChart);
@@ -61,6 +58,7 @@ function initializeUI() {
     updateTravelMode();
 }
 
+// FIXME: what is the effect of this formula on latlongs?
 function findDistance(latLng1, latLng2) {
     return Math.sqrt(
         Math.pow(latLng1.lat() - latLng2.lat(), 2) + 
@@ -68,7 +66,7 @@ function findDistance(latLng1, latLng2) {
     );
 }
 
-function directionsLoaded() {
+function directionsLoaded(directions_result) {
     var a = {
         path: directionsResultLatLngs(directions_result),
         strokeColor: "#0000CC",
@@ -77,7 +75,9 @@ function directionsLoaded() {
     },
         b = [],
         c = a.path[0];
-    for (marker_num = 0; marker_num < marker_container.length; marker_num++) b.push([findDistance(c, marker_container[marker_num].getPosition()), marker_num]);
+    for (marker_num = 0; marker_num < marker_container.length; marker_num++) {
+        b.push([findDistance(c, marker_container[marker_num].getPosition()), marker_num]);
+    }
     b.sort(function (a, b) {
         return a[0] - b[0]
     });
@@ -91,33 +91,31 @@ function directionsLoaded() {
     });
     for (b = a = 0; b < polyline_container.length; b++) b in polyline_container && (a += polyline_container[b].distance);
     ELEMENTS.totalDistance.innerHTML = "Distance: " + Math.round(a) + " km";
-    directionsQue.length ? window.setTimeout(directionsQueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && initElevation()
+    directionsQueue.length ? window.setTimeout(directionsQueueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && initElevation()
 }
 
 function directionsResultLatLngs(a) {
     var b = [];
+
     for (x = 0; x < a.routes[0].legs[0].steps.length; x++) {
-        for (y = 0; y < a.routes[0].legs[0].steps[x].lat_lngs.length - 1; y++) b.push(a.routes[0].legs[0].steps[x].lat_lngs[y]);
+        for (y = 0; y < a.routes[0].legs[0].steps[x].lat_lngs.length - 1; y++) {
+            b.push(a.routes[0].legs[0].steps[x].lat_lngs[y]);
+        }
         b.push(a.routes[0].legs[0].steps[x].lat_lngs[y])
     }
     return b
 }
-function mapClick(a) {
-    clckTimeOut ? (window.clearTimeout(clckTimeOut), clckTimeOut = null) : clckTimeOut = window.setTimeout(function () {
-        addMarker(a.latLng)
-    }, 275)
-}
 
 function addMarker(position) {
     var b, c;
-    window.clearTimeout(clckTimeOut);
-    clckTimeOut = null;
+    //window.clearTimeout(clckTimeOut);
+    //clckTimeOut = null;
     if (!position) return;
 
     var marker = new google.maps.Marker({
         position: position,
         map: map,
-        draggable: !0
+        draggable: true
     });
     marker_container.push(marker);
     google.maps.event.addListener(marker, "click", function () {
@@ -129,21 +127,18 @@ function addMarker(position) {
         marker_container.splice(marker_index, 1);
         marker.setMap(null);
         if (polyline_container.length) {
+            // Note: we erased 1 item!
             if (marker_index == marker_container.length) {
                 polyline = polyline_container.splice(-1, 1);
                 polyline[0].setMap(null);
                 results_container.splice(-1, 1);
             } else {
-                if (marker_index == 0) {
-                    polyline = polyline_container.splice(marker_index, 1);
-                    polyline[0].setMap(null);
-                    results_container.splice(marker_index, 1); 
-                } else {
-                    polyline = polyline_container.splice(marker_index, 1);
-                    polyline[0].setMap(null);
-                    results_container.splice(marker_index, 1);
+                polyline = polyline_container.splice(marker_index, 1);
+                polyline[0].setMap(null);
+                results_container.splice(marker_index, 1); 
+                if (marker_index != 0) {
                     polyline_container[marker_index - 1].setMap(null);
-                    directionsQueProcessor(b, c);
+                    directionsQueueProcessor(b, c);
                 }
             }
         }
@@ -152,47 +147,55 @@ function addMarker(position) {
         if (marker_container.length > 0) {
             marker_index = marker_container.indexOf(marker);
             if (marker_index == 0) {
-                (polyline = polyline_container.splice(0, 1), polyline[0].setMap(null), directionsQueProcessor(marker_container[0], marker_container[marker_index + 1]))
+                (polyline = polyline_container.splice(0, 1), polyline[0].setMap(null), directionsQueueProcessor(marker_container[0], marker_container[marker_index + 1]))
             } else {
                 if (marker_index == marker_container.length - 1) {
                     polyline = polyline_container.splice(-1, 1);
                     polyline[0].setMap(null);
-                    directionsQueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
+                    directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
                 } else {
                     polyline_container[marker_index - 1].setMap(null);
                     polyline_container[marker_index].setMap(null);
-                    directionsQueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
-                    directionsQueProcessor(marker_container[marker_index], marker_container[marker_index + 1]);
+                    directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
+                    directionsQueueProcessor(marker_container[marker_index], marker_container[marker_index + 1]);
                 }
             }
         }
     });
     numMarkers = marker_container.length;
-    numMarkers > 1 && (initComplete ? directionsQueProcessor(marker_container[numMarkers - 2], marker_container[numMarkers - 1]) : directionsQue.push([marker_container[numMarkers - 2], marker_container[numMarkers - 1]]))
+    numMarkers > 1 && (initComplete ? directionsQueueProcessor(marker_container[numMarkers - 2], marker_container[numMarkers - 1]) : directionsQueue.push([marker_container[numMarkers - 2], marker_container[numMarkers - 1]]))
 }
 
-function directionsQueProcessor() {
-    arguments.length && directionsQue.push(arguments);
-    directionsQue.length > 0 ? (request = directionsQue.shift()) ? findDirections(request[0], request[1]) : findDirections() : findDirections()
+function directionsQueueProcessor() {
+    arguments.length && directionsQueue.push(arguments);
+    directionsQueue.length > 0 ? (request = directionsQueue.shift()) ? findDirections(request[0], request[1]) : findDirections() : findDirections()
 }
 
 function findDirections() {
     window._fd += 1;
-    arguments.length > 1 ? (start_point = arguments[0].getPosition(), end_point = arguments[1].getPosition()) : (start_point = marker_container[marker_container.length - 2].getPosition(), end_point = marker_container[marker_container.length - 1].getPosition());
-    directions.route({
+    if (arguments.length > 1) {
+        start_point = arguments[0].getPosition();
+        end_point = arguments[1].getPosition();
+    } else {
+        start_point = marker_container[marker_container.length - 2].getPosition();
+        end_point = marker_container[marker_container.length - 1].getPosition();
+    }
+    directionsService.route({
         origin: start_point,
         destination: end_point,
         travelMode: travelMode,
-        avoidHighways: !0
-    }, function (a, b) {
-        if (b == "OK") {
-            directions_result = a;
-            directionsLoaded();
-        } else if (b == "UNKNOWN_ERROR") {
+        avoidHighways: true
+    }, function (directions_result, directions_status) {
+        if (directions_status == "OK") {
+            directionsLoaded(directions_result);
+        } else if (directions_status == "UNKNOWN_ERROR") {
+            // FIXME: WTF is this???
             for (t = 0; polyline_container[t] != void 0 && t < polyline_container.length - 1; t++);
-            marker_container[t] == void 0 ? directionsQueProcessor(marker_container[t], marker_container[t + 1]) : directionsQueProcessor(marker_container[marker_container.length - 2], marker_container[marker_container.length - 1])
+            marker_container[t] == void 0 ? directionsQueueProcessor(marker_container[t], marker_container[t + 1]) : directionsQueueProcessor(marker_container[marker_container.length - 2], marker_container[marker_container.length - 1])
         } else {
-            alert("The last waypoint could not be added to the map.");
+            // FIXME: really this is the only case?
+            alert("The last waypoint could not be added to the map (bike routing outside US?.");
+            alert(directions_status);
             m = marker_container.pop();
             m.setMap(null);
         }
@@ -218,7 +221,7 @@ function clearMarkers() {
 function initElevation() {
     var a = [];
     for (path = 0; path < polyline_container.length; path++) {
-        latLngs = polyline_container[path].getPath();
+        var latLngs = polyline_container[path].getPath();
         for (x = 0; x < latLngs.length; x++) {
             a.push(latLngs.getAt(x))
         }
@@ -231,12 +234,12 @@ function initElevation() {
             old_verticies[Math.round(x)] != void 0 && a.push(old_verticies[Math.round(x)])
         }
     }
-    if (polyline_container.length > 0) {
-        a = {
+    if (a.length > 0 && elevationService != null) {
+        var query = {
             path: a,
             samples: 500
         }
-        elevation && elevation.getElevationAlongPath(a, plotElevation)
+        elevationService.getElevationAlongPath(query, plotElevation)
     } else {
         al.clear()
         al2.clear()
@@ -415,7 +418,6 @@ function init() {
     if (!arguments.callee.done) {
         arguments.callee.done = !0;
         _timer && clearInterval(_timer);
-        initializeMap();
         initializeUI();
         initComplete = !0
     }
