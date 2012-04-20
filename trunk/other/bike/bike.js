@@ -36,6 +36,7 @@ var ELEMENTS = {
     elevationChart: document.getElementById("elevation_chart"),
     slopeChart: document.getElementById("slope_chart"),
     totalDistance: document.getElementById("total_distance"),
+    totalAscent: document.getElementById("total_ascent"),
 }
 
 function updateTravelMode() {
@@ -81,16 +82,17 @@ function directionsLoaded(directions_result) {
     b.sort(function (a, b) {
         return a[0] - b[0]
     });
-    polyline_container[b[0][1]] = new google.maps.Polyline(a);
-    polyline_container[b[0][1]].distance = directions_result.routes[0].legs[0].distance.value / 1E3;
-    results_container[b[0][1]] = directions_result;
-    google.maps.event.addListener(polyline_container[b[0][1]], "click", function (a) {
+    var marker_index = b[0][1];
+    polyline_container[marker_index] = new google.maps.Polyline(a);
+    polyline_container[marker_index].distance = directions_result.routes[0].legs[0].distance.value / 1E3;
+    results_container[marker_index] = directions_result;
+    google.maps.event.addListener(polyline_container[marker_index], "click", function (a) {
         vertex = findSmallestDistance(a.latLng);
         addSplitMarker(vertex);
         divisionVerticies.push(vertex);
     });
     for (b = a = 0; b < polyline_container.length; b++) b in polyline_container && (a += polyline_container[b].distance);
-    ELEMENTS.totalDistance.innerHTML = "Distance: " + Math.round(a) + " km";
+    ELEMENTS.totalDistance.text = "Distance: " + Math.round(a) + " km";
     directionsQueue.length ? window.setTimeout(directionsQueueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && initElevation()
 }
 
@@ -230,8 +232,8 @@ function initElevation() {
         _short = a.length / 260;
         old_verticies = a;
         a = [];
-        for (x = 0; x < old_verticies.length; x += _short) {
-            old_verticies[Math.round(x)] != void 0 && a.push(old_verticies[Math.round(x)])
+        for (x = 0; x <= old_verticies.length - 1; x += _short) {
+            a.push(old_verticies[Math.round(x)])
         }
     }
     if (a.length > 0 && elevationService != null) {
@@ -250,8 +252,8 @@ function addSplitMarker(a) {
     splitMarker = new google.maps.Marker({
         position: a,
         map: map,
-        draggable: !0,
-        clickable: !0,
+        draggable: true,
+        clickable: true,
         oldPosition: a,
         icon: "http://labs.google.com/ridefinder/images/mm_20_white.png"
     });
@@ -314,7 +316,7 @@ function plotElevation(a, b) {
             diff = elevations[e].elevation - elevations[e-1].elevation;
             ascent += diff > 0 ? diff : 0
         }
-        document.getElementById("total_ascent").innerHTML = "Ascent: " + Math.round(ascent) + " m";
+        ELEMENTS.totalAscent.text = "Ascent: " + Math.round(ascent) + " m";
     } else initElevation()
 }
 
@@ -330,11 +332,25 @@ function MapControl(a, b, c, e) {
         h;
     switch (b) {
     case "top":
-        for (var f = 0; f < c.length; f++) h = document.createElement("div"), h.appendChild(document.createTextNode(c[f].name)), c[f].id && h.setAttribute("id", c[f].id), b = document.createElement("div"), b.appendChild(h), g.appendChild(b), this.setTopInnerStyle(h), this.setTopMiddleStyle(b), google.maps.event.addDomListener(b, "click", c[f].action);
+        for (var f = 0; f < c.length; f++) {
+            h = document.createElement("div");
+            h.appendChild(document.createTextNode(c[f].name));
+            c[f].id && h.setAttribute("id", c[f].id);
+            b = document.createElement("div");
+            b.appendChild(h);
+            g.appendChild(b);
+            this.setTopInnerStyle(h);
+            this.setTopMiddleStyle(b);
+            google.maps.event.addDomListener(b, "click", c[f].action);
+        }
         this.setTopContainerStyle(g);
         break;
     case "drop":
-        for (f = 0; f < c.length; f++) h = document.createElement("div"), h.appendChild(document.createTextNode(c[f].name)), c[f].id && h.setAttribute("id", c[f].id), g.appendChild(h), this.setDropInnerStyle(h), google.maps.event.addDomListener(h, "click", c[f].action);
+        for (f = 0; f < c.length; f++) {
+            h = document.createElement("div");
+            h.appendChild(document.createTextNode(c[f].name));
+            c[f].id && h.setAttribute("id", c[f].id), g.appendChild(h), this.setDropInnerStyle(h), google.maps.event.addDomListener(h, "click", c[f].action);
+        }
         this.setDropContainerStyle(g)
     }
     g.index = 1;
@@ -392,18 +408,28 @@ function directionsCenter(a) {
 
 function findSmallestDistance(a) {
     verticies = [];
-    for (path = 0; path < polyline_container.length; path++) latLngs = polyline_container[path].getPath(), verticies = verticies.concat(latLngs.getArray());
+    for (path = 0; path < polyline_container.length; path++) {
+        latLngs = polyline_container[path].getPath();
+        verticies = verticies.concat(latLngs.getArray());
+    }
     smDelta = 100;
     smDelta.vertex = verticies[0];
     distance = 0;
     distances = [];
-    for (v = 0; v < verticies.length; v++) distance = findDistance(a, verticies[v]), distances.push(distance), distance < smDelta && (smDelta = distance, closestVertex = verticies[v]);
+    for (v = 0; v < verticies.length; v++) {
+        distance = findDistance(a, verticies[v]);
+        distances.push(distance);
+        if (distance < smDelta) {
+            smDelta = distance;
+            closestVertex = verticies[v];
+        }
+    }
     return closestVertex
 }
 
 function elevationClick() {
-    selection = al.getSelection();
-    vertex = findSmallestDistance(selection.location);
+    var selection = al.getSelection();
+    var vertex = findSmallestDistance(selection.location);
     addSplitMarker(vertex);
     divisionVerticies.push(vertex);
     return [vertex, v]
