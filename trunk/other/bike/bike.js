@@ -114,23 +114,57 @@ function addMarker(position) {
     clckTimeOut = null;
     if (!position) return;
 
-    var e = new google.maps.Marker({
+    var marker = new google.maps.Marker({
         position: position,
         map: map,
         draggable: !0
     });
-    marker_container.push(e);
-    google.maps.event.addListener(e, "click", function () {
-        marker_index = findIndex(marker_container, this);
-        marker_index != 0 && marker_index < marker_container.length - 1 && (b = marker_container[marker_index - 1], c = marker_container[marker_index + 1]);
+    marker_container.push(marker);
+    google.maps.event.addListener(marker, "click", function () {
+        var marker_index = marker_container.indexOf(marker);
+        if (marker_index != 0 && marker_index < marker_container.length - 1) {
+            b = marker_container[marker_index - 1]
+            c = marker_container[marker_index + 1]
+        }
         marker_container.splice(marker_index, 1);
-        this.setMap(null);
-        polyline_container.length && (marker_index == marker_container.length ? (polyline = polyline_container.splice(-1, 1), polyline[0].setMap(null), results_container.splice(-1, 1)) : marker_index == 0 ? (polyline = polyline_container.splice(marker_index, 1), polyline[0].setMap(null), results_container.splice(marker_index, 1)) : (polyline = polyline_container.splice(marker_index, 1), polyline[0].setMap(null), results_container.splice(marker_index, 1), polyline_container[marker_index - 1].setMap(null), directionsQueProcessor(b, c)))
+        marker.setMap(null);
+        if (polyline_container.length) {
+            if (marker_index == marker_container.length) {
+                polyline = polyline_container.splice(-1, 1);
+                polyline[0].setMap(null);
+                results_container.splice(-1, 1);
+            } else {
+                if (marker_index == 0) {
+                    polyline = polyline_container.splice(marker_index, 1);
+                    polyline[0].setMap(null);
+                    results_container.splice(marker_index, 1); 
+                } else {
+                    polyline = polyline_container.splice(marker_index, 1);
+                    polyline[0].setMap(null);
+                    results_container.splice(marker_index, 1);
+                    polyline_container[marker_index - 1].setMap(null);
+                    directionsQueProcessor(b, c);
+                }
+            }
+        }
     });
-    google.maps.event.addListener(e, "dragend", function () {
+    google.maps.event.addListener(marker, "dragend", function () {
         if (marker_container.length > 0) {
-            marker_index = findIndex(marker_container, e);
-            marker_index == 0 ? (polyline = polyline_container.splice(0, 1), polyline[0].setMap(null), directionsQueProcessor(marker_container[0], marker_container[marker_index + 1])) : marker_index == marker_container.length - 1 ? (polyline = polyline_container.splice(-1, 1), polyline[0].setMap(null), directionsQueProcessor(marker_container[marker_index - 1], marker_container[marker_index])) : (polyline_container[marker_index - 1].setMap(null), polyline_container[marker_index].setMap(null), directionsQueProcessor(marker_container[marker_index - 1], marker_container[marker_index]), directionsQueProcessor(marker_container[marker_index], marker_container[marker_index + 1]))
+            marker_index = marker_container.indexOf(marker);
+            if (marker_index == 0) {
+                (polyline = polyline_container.splice(0, 1), polyline[0].setMap(null), directionsQueProcessor(marker_container[0], marker_container[marker_index + 1]))
+            } else {
+                if (marker_index == marker_container.length - 1) {
+                    polyline = polyline_container.splice(-1, 1);
+                    polyline[0].setMap(null);
+                    directionsQueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
+                } else {
+                    polyline_container[marker_index - 1].setMap(null);
+                    polyline_container[marker_index].setMap(null);
+                    directionsQueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
+                    directionsQueProcessor(marker_container[marker_index], marker_container[marker_index + 1]);
+                }
+            }
         }
     });
     numMarkers = marker_container.length;
@@ -181,12 +215,6 @@ function clearMarkers() {
     al2.clear();
 }
 
-
-function getVerticies(a) {
-    for (var b = [], c = 0; c < a.legs.length; c++) for (var e = 0; e < a.legs[c].steps.length; e++) for (var g = 0; g < a.legs[c].steps[e].lat_lngs.length; g++) b.push(a.legs[c].steps[e].lat_lngs[g]);
-    return b
-}
-
 function initElevation() {
     var a = [];
     for (path = 0; path < polyline_container.length; path++) {
@@ -228,22 +256,17 @@ function addSplitMarker(a) {
         oldPosition = this.oldPosition;
         newPosition = dragOnTrack(a.latLng);
         this.setPosition(newPosition);
-        vertexIndex = findIndex(divisionVerticies, oldPosition);
+        vertexIndex = divisionVerticies.indexOf(oldPosition);
         this.oldPosition = divisionVerticies[vertexIndex] = newPosition
     });
     google.maps.event.addListener(splitMarker, "dragend", function () {
-        redrawStaticMaps()
     });
     google.maps.event.addListener(splitMarker, "click", function () {
-        i = findIndex(divisionVerticies, this.getPosition());
+        i = divisionVerticies.indexOf(this.getPosition());
         divisionVerticies.splice(i, 1);
         this.setMap(null);
-        redrawStaticMaps()
     });
     return splitMarker
-}
-function redrawStaticMaps() {
-    return;
 }
 
 function plotElevation(a, b) {
@@ -363,13 +386,6 @@ function directionsCenter(a) {
     return b
 }
 
-function findIndex(a, b) {
-    for (x = 0; x < a.length;) {
-        if (a[x] == b) return x;
-        x++
-    }
-    return -1
-}
 
 function findSmallestDistance(a) {
     verticies = [];
