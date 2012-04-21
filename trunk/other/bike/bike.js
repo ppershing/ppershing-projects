@@ -409,11 +409,31 @@ function plotSlope(elevations) {
         })
 }
 
+function smooth(data) {
+    if (data.length < 2) {
+        return data;
+    }
+
+    var res = [];
+    res.push(data[0]);
+    for (var x = 1; x < data.length - 1; x++) {
+        res.push((data[x-1] + data[x] + data[x+1]) / 3);
+    }
+    return res;
+}
+
 function getAscent(elevations) {
+    var data = []
+    for (var x = 0; x < elevations.length; x++) {
+        data.push(elevations[x].elevation);
+    }
+    
+    data = smooth(data);
+    data = smooth(data);
+
     var ascent = 0;
-    for (var e = 1; e < elevations.length; e++) {
-        diff = elevations[e].elevation - elevations[e-1].elevation;
-        ascent += diff > 0 ? diff : 0
+    for (var x = 1; x < data.length; x++) {
+        ascent += Math.max(data[x] - data[x-1], 0);
     }
     return ascent;
 }
