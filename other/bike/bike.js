@@ -7,13 +7,15 @@ var map;
 var directionsService = new google.maps.DirectionsService;
 var elevationService = new google.maps.ElevationService;
 google.load("visualization", "1", {
-    packages: ["columnchart"]
+    packages: ["corechart"]
 });
 
-var sections = [];
+var sections = {
+    
+}
 
 var marker_container = [];
-var ModeSpecificControls, mode_control, clckTimeOut = null,
+var ModeSpecificControls, clckTimeOut = null,
     travelMode = google.maps.DirectionsTravelMode.DRIVING,
     results_container = [],
     polyline_container = [],
@@ -30,6 +32,10 @@ var CONFIG = {
         center: new google.maps.LatLng(46.6, 7.7),
         mapTypeId: google.maps.MapTypeId.HYBRID
     },
+    SPEED_SETTINGS : {
+        SPEED_KM_FLAT: 22 /*km/h*/,
+        ASCENT_METRES_MIN: 15 /*m/min*/,
+    }
 };
 
 var ELEMENTS = {
@@ -39,6 +45,7 @@ var ELEMENTS = {
     slopeChart: document.getElementById("slope_chart"),
     totalDistance: document.getElementById("total_distance"),
     totalAscent: document.getElementById("total_ascent"),
+    estimatedTime: document.getElementById("estimated_time"),
 }
 
 function updateTravelMode() {
@@ -89,13 +96,13 @@ function directionsLoaded(directions_result) {
     polyline_container[marker_index].distance = directions_result.routes[0].legs[0].distance.value / 1E3;
     results_container[marker_index] = directions_result;
     google.maps.event.addListener(polyline_container[marker_index], "click", function (a) {
-        vertex = findSmallestDistance(a.latLng);
+        vertex = findNearestVertex(a.latLng);
         addSplitMarker(vertex);
         divisionVerticies.push(vertex);
     });
     for (b = a = 0; b < polyline_container.length; b++) b in polyline_container && (a += polyline_container[b].distance);
-    ELEMENTS.totalDistance.text = "Distance: " + Math.round(a) + " km";
-    directionsQueue.length ? window.setTimeout(directionsQueueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && initElevation()
+    ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a) + " km";
+    directionsQueue.length ? window.setTimeout(directionsQueueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && updateElevation()
 }
 
 function directionsResultLatLngs(a) {
@@ -109,6 +116,55 @@ function directionsResultLatLngs(a) {
     }
     return b
 }
+
+function clickMarker(marker) {
+    var b, c;
+    var marker_index = marker_container.indexOf(marker);
+    if (marker_index != 0 && marker_index < marker_container.length - 1) {
+        b = marker_container[marker_index - 1]
+        c = marker_container[marker_index + 1]
+    }
+    marker_container.splice(marker_index, 1);
+    marker.setMap(null);
+    if (polyline_container.length) {
+        // Note: we erased 1 item!
+        if (marker_index == marker_container.length) {
+            polyline = polyline_container.splice(-1, 1);
+            polyline[0].setMap(null);
+            results_container.splice(-1, 1);
+        } else {
+            polyline = polyline_container.splice(marker_index, 1);
+            polyline[0].setMap(null);
+            results_container.splice(marker_index, 1); 
+            if (marker_index != 0) {
+                polyline_container[marker_index - 1].setMap(null);
+                directionsQueueProcessor(b, c);
+            }
+        }
+    }
+}
+
+function dragendMarker(marker) {
+    if (marker_container.length > 0) {
+        marker_index = marker_container.indexOf(marker);
+        if (marker_index == 0) {
+            (polyline = polyline_container.splice(0, 1), polyline[0].setMap(null), directionsQueueProcessor(marker_container[0], marker_container[marker_index + 1]))
+        } else {
+            if (marker_index == marker_container.length - 1) {
+                polyline = polyline_container.splice(-1, 1);
+                polyline[0].setMap(null);
+                directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
+            } else {
+                polyline_container[marker_index - 1].setMap(null);
+                polyline_container[marker_index].setMap(null);
+                directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
+                directionsQueueProcessor(marker_container[marker_index], marker_container[marker_index + 1]);
+            }
+        }
+    }
+
+}
+
 
 function addMarker(position) {
     if (!position) return;
@@ -124,56 +180,23 @@ function addMarker(position) {
         routing: null,
         routingMode: null,
     }
-    sections.push(section);
+    //sections.push(section);
 
     marker_container.push(marker);
     google.maps.event.addListener(marker, "click", function () {
-        var b, c;
-        var marker_index = marker_container.indexOf(marker);
-        if (marker_index != 0 && marker_index < marker_container.length - 1) {
-            b = marker_container[marker_index - 1]
-            c = marker_container[marker_index + 1]
-        }
-        marker_container.splice(marker_index, 1);
-        marker.setMap(null);
-        if (polyline_container.length) {
-            // Note: we erased 1 item!
-            if (marker_index == marker_container.length) {
-                polyline = polyline_container.splice(-1, 1);
-                polyline[0].setMap(null);
-                results_container.splice(-1, 1);
-            } else {
-                polyline = polyline_container.splice(marker_index, 1);
-                polyline[0].setMap(null);
-                results_container.splice(marker_index, 1); 
-                if (marker_index != 0) {
-                    polyline_container[marker_index - 1].setMap(null);
-                    directionsQueueProcessor(b, c);
-                }
-            }
-        }
+        clickMarker(marker);
     });
     google.maps.event.addListener(marker, "dragend", function () {
-        if (marker_container.length > 0) {
-            marker_index = marker_container.indexOf(marker);
-            if (marker_index == 0) {
-                (polyline = polyline_container.splice(0, 1), polyline[0].setMap(null), directionsQueueProcessor(marker_container[0], marker_container[marker_index + 1]))
-            } else {
-                if (marker_index == marker_container.length - 1) {
-                    polyline = polyline_container.splice(-1, 1);
-                    polyline[0].setMap(null);
-                    directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
-                } else {
-                    polyline_container[marker_index - 1].setMap(null);
-                    polyline_container[marker_index].setMap(null);
-                    directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
-                    directionsQueueProcessor(marker_container[marker_index], marker_container[marker_index + 1]);
-                }
-            }
-        }
+        dragendMarker(marker);
     });
-    numMarkers = marker_container.length;
-    numMarkers > 1 && (initComplete ? directionsQueueProcessor(marker_container[numMarkers - 2], marker_container[numMarkers - 1]) : directionsQueue.push([marker_container[numMarkers - 2], marker_container[numMarkers - 1]]))
+    var numMarkers = marker_container.length;
+    if (numMarkers > 1) { 
+        if (initComplete) {
+            directionsQueueProcessor(marker_container[numMarkers - 2], marker_container[numMarkers - 1])
+        } else {
+            directionsQueue.push([marker_container[numMarkers - 2], marker_container[numMarkers - 1]])
+        }
+    }
 }
 
 function directionsQueueProcessor() {
@@ -224,35 +247,40 @@ function clearMarkers() {
     polyline_container = [];
     results_container = [];
     divisionVerticies = [];
-    al.clear();
-    al2.clear();
+    al.clearChart();
+    al2.clearChart();
 }
 
-function initElevation() {
-    var a = [];
-    for (path = 0; path < polyline_container.length; path++) {
-        var latLngs = polyline_container[path].getPath();
-        for (x = 0; x < latLngs.length; x++) {
-            a.push(latLngs.getAt(x))
+function updateElevation() {
+    var track = [];
+    for (var segment = 0; segment < polyline_container.length; segment++) {
+        var latLngs = polyline_container[segment].getPath();
+        for (var x = 0; x < latLngs.length; x++) {
+            track.push(latLngs.getAt(x))
         }
     }
-    if (a.length > 350) {
-        _short = a.length / 260;
-        old_verticies = a;
-        a = [];
-        for (x = 0; x <= old_verticies.length - 1; x += _short) {
-            a.push(old_verticies[Math.round(x)])
+
+    if (track.length > 350) {
+        var skip = track.length / 340;
+        var old = track;
+        track = [];
+        for (var x = 0; x <= old.length - 1; x += skip) {
+            // better to use floor than round (will not round to same value
+            // twice
+            track.push(old[Math.floor(x)])
         }
     }
-    if (a.length > 0 && elevationService != null) {
+
+    if (track.length > 0 && elevationService != null) {
         var query = {
-            path: a,
+            path: track,
             samples: 500
         }
-        elevationService.getElevationAlongPath(query, plotElevation)
+        elevationService.getElevationAlongPath(query, plotElevationCallback)
     } else {
-        al.clear()
-        al2.clear()
+        ELEMENTS.totalAscent.textContent = "total ascent: N/A"
+        al.clearChart()
+        al2.clearChart()
     }
 }
 
@@ -267,7 +295,7 @@ function addSplitMarker(a) {
     });
     google.maps.event.addListener(splitMarker, "drag", function (a) {
         oldPosition = this.oldPosition;
-        newPosition = dragOnTrack(a.latLng);
+        newPosition = findNearestVertex(a.latLng);
         this.setPosition(newPosition);
         vertexIndex = divisionVerticies.indexOf(oldPosition);
         this.oldPosition = divisionVerticies[vertexIndex] = newPosition
@@ -282,16 +310,19 @@ function addSplitMarker(a) {
     return splitMarker
 }
 
-function plotElevation(a, b) {
-    if (b == google.maps.ElevationStatus.OK) {
-        elevations = a;
-        for (d = totdistance = 0; d < results_container.length; d++) totdistance += results_container[d].routes[0].legs[0].distance.value;
+function totalDistance() {
+    for (d = totdistance = 0; d < results_container.length; d++) totdistance += results_container[d].routes[0].legs[0].distance.value;
+    return totdistance;
+}
+
+function plotElevation(elevations) {
+        var totdistance = totalDistance();
         var c = new google.visualization.DataTable;
         c.addColumn("number", "Distance");
         c.addColumn("number", "Elevation");
-        for (var e = 0; e < a.length; e++) {
-            elevations[e].distance = e / elevations.length * totdistance / 1000.0;
-            c.addRow([elevations[e].distance, elevations[e].elevation]);
+        for (var e = 0; e < elevations.length; e++) {
+            var distance = e / elevations.length * totdistance / 1000.0;
+            c.addRow([distance, elevations[e].elevation]);
         }
 
         al.draw(c, {
@@ -303,29 +334,68 @@ function plotElevation(a, b) {
                 elevationClick();
             }
         })
+}
+
+function plotSlope(elevations) {
+        var totdistance = totalDistance();
 
         var c2 = new google.visualization.DataTable;
         c2.addColumn("string", "Dist");
         c2.addColumn("number", "Slope");
         distSkip = 1 + Math.floor(elevations.length * 1000 / totdistance);
-        for (var e = distSkip; e < a.length; e+=distSkip) {
+        for (var e = distSkip; e < elevations.length; e+=distSkip) {
+            var distance = e / elevations.length * totdistance / 1000;
             elediff = elevations[e].elevation - elevations[e-distSkip].elevation;
             slope = elediff / (distSkip * totdistance / elevations.length);
-            c2.addRow([Math.round(elevations[e].distance) + "", slope * 100]);
+            c2.addRow([Math.round(distance) + "", slope * 100]);
         }
         al2.draw(c2, {
             width: 811,
             height: 250,
             series: [{color: 'black', visibleInLegend: false}],
         })
+}
 
-        ascent = 0;
-        for (var e = 1; e < a.length; e++) {
-            diff = elevations[e].elevation - elevations[e-1].elevation;
-            ascent += diff > 0 ? diff : 0
-        }
-        ELEMENTS.totalAscent.text = "Ascent: " + Math.round(ascent) + " m";
-    } else initElevation()
+function getAscent(elevations) {
+    var ascent = 0;
+    for (var e = 1; e < elevations.length; e++) {
+        diff = elevations[e].elevation - elevations[e-1].elevation;
+        ascent += diff > 0 ? diff : 0
+    }
+    return ascent;
+}
+
+/**
+ * @returns estimated time in hours
+ */
+function getEstimatedTime(dist_in_m, ascent_in_m) {
+    var flat_time = dist_in_m / 1000 / CONFIG.SPEED_SETTINGS.SPEED_KM_FLAT;
+    var ascent_time = ascent_in_m / CONFIG.SPEED_SETTINGS.ASCENT_METRES_MIN / 60;
+    return flat_time + ascent_time;
+}
+
+function updateAscentInfo(elevations) {
+    ELEMENTS.totalAscent.textContent = "Ascent: " +
+        Math.round(getAscent(elevations)) + " m";
+    var time = getEstimatedTime(totalDistance(), getAscent(elevations))
+    var hours = Math.floor(time);
+    var mins = Math.round(60 * (time - hours));
+    ELEMENTS.estimatedTime.textContent =
+        "Estimated time: " + hours + "h " + mins + "m";
+}
+
+function plotElevationCallback(a, b) {
+    if (b == google.maps.ElevationStatus.OK) {
+        // FIXME: this needs to be global due to the stupid graph!
+        elevations = a;
+        plotElevation(elevations)
+        plotSlope(elevations)
+        updateAscentInfo(elevations)
+    } else {
+        al.clearChart();
+        al2.clearChart();
+        ELEMENTS.totalAscent.textContent = "error retrieving elevation info!";
+    }
 }
 
 
@@ -414,19 +484,17 @@ function directionsCenter(a) {
 }
 
 
-function findSmallestDistance(a) {
-    verticies = [];
+function findNearestVertex(a) {
+    var verticies = [];
     for (path = 0; path < polyline_container.length; path++) {
         latLngs = polyline_container[path].getPath();
         verticies = verticies.concat(latLngs.getArray());
     }
-    smDelta = 100;
-    smDelta.vertex = verticies[0];
-    distance = 0;
-    distances = [];
+    var smDelta = 100;
+    var distance = 0;
+    var closestVertex = null;
     for (v = 0; v < verticies.length; v++) {
         distance = findDistance(a, verticies[v]);
-        distances.push(distance);
         if (distance < smDelta) {
             smDelta = distance;
             closestVertex = verticies[v];
@@ -437,15 +505,12 @@ function findSmallestDistance(a) {
 
 function elevationClick() {
     var selection = al.getSelection();
-    var vertex = findSmallestDistance(selection.location);
+    var vertex = findNearestVertex(selection.location);
     addSplitMarker(vertex);
     divisionVerticies.push(vertex);
     return [vertex, v]
 }
 
-function dragOnTrack(a) {
-    return findSmallestDistance(a)
-};
 var initComplete = !1;
 
 function init() {
@@ -461,4 +526,3 @@ if (/WebKit/i.test(navigator.userAgent)) var _timer = setInterval(function () {
     /loaded|complete/.test(document.readyState) && init()
 }, 10);
 window.onload = init;
-var mousemarker = null;
