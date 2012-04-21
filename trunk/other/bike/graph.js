@@ -14,7 +14,7 @@ var rfbm = {
         }
     };
 rfbm.areaLine.prototype.draw = function (a, b) {
-    this.box.childNodes.length > 0 && this.clear();
+    this.box.childNodes.length > 0 && this.clearChart();
     var c = b.width ? b.width : this.container.parentNode.clientWidth;
     this.plotWidth = c - 100;
     var e = b.height ? b.height : this.container.parentNode.clientHeight;
@@ -119,7 +119,7 @@ rfbm.areaLine.prototype.setSelection = function (a) {
     document.getElementById("selection") != null && document.getElementById("selection").parentNode.removeChild(this.selection);
     return this.selection = rfbm.selectCol(a)
 };
-rfbm.areaLine.prototype.clear = function () {
+rfbm.areaLine.prototype.clearChart = function () {
     this.box.removeChild(this.box.firstChild)
 };
 rfbm.getChartMax = function (a, b) {
