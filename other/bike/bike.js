@@ -24,6 +24,8 @@ var ModeSpecificControls, clckTimeOut = null,
     elevationChart = null,
     slopeChart = null,
     divisionVerticies = [];
+
+var elevations = [];
 var slopeToElevationIndex = [];
 
 var CONFIG = {
@@ -68,6 +70,7 @@ function initializeUI() {
     elevationChart = new google.visualization.AreaChart(ELEMENTS.elevationChart);
     google.visualization.events.addListener(elevationChart, 'onmouseover', elevationMouseOver);
     google.visualization.events.addListener(elevationChart, 'onmouseout', elevationMouseOut);
+    google.visualization.events.addListener(elevationChart, 'select', elevationClick);
 
     slopeChart = new google.visualization.ColumnChart(ELEMENTS.slopeChart);
     google.visualization.events.addListener(slopeChart, 'onmouseover', slopeMouseOver);
@@ -94,6 +97,7 @@ function elevationMouseOver(e) {
         });
     }
     mousemarker.setPosition(elevations[e.row].location);
+    elevationChartLastPos = e.row;
 }
 
 function elevationMouseOut(e) {
@@ -110,7 +114,13 @@ function slopeMouseOver(e) {
         selection.push({'row': x, 'column': 1});
     }
     elevationChart.setSelection(selection);
+}
 
+function elevationClick() {
+    var vertex = findNearestVertex(elevations[elevationChartLastPos].location);
+    addSplitMarker(vertex);
+    divisionVerticies.push(vertex);
+    return [vertex, v]
 }
 
 function slopeMouseOut(e) {
@@ -605,13 +615,6 @@ function findNearestVertex(a) {
     return closestVertex
 }
 
-function elevationClick() {
-    var selection = elevationChart.getSelection();
-    var vertex = findNearestVertex(selection.location);
-    addSplitMarker(vertex);
-    divisionVerticies.push(vertex);
-    return [vertex, v]
-}
 
 var initComplete = !1;
 
