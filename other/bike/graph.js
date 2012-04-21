@@ -120,7 +120,9 @@ rfbm.areaLine.prototype.setSelection = function (a) {
     return this.selection = rfbm.selectCol(a)
 };
 rfbm.areaLine.prototype.clearChart = function () {
-    this.box.removeChild(this.box.firstChild)
+    if (this.box.firstChild) {
+        this.box.removeChild(this.box.firstChild)
+    }
 };
 rfbm.getChartMax = function (a, b) {
     return a.getColumnRange(b).max

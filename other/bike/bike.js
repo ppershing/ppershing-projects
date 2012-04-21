@@ -61,7 +61,8 @@ function initializeUI() {
     map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
     google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng);});
 
-    mode_control = new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
+    // "skip" && "generate permalink"
+    new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
     google.maps.event.addDomListener(ELEMENTS.travelModeSelect, "change", updateTravelMode);
     al = new rfbm.areaLine(ELEMENTS.elevationChart);
     al2 = new google.visualization.ColumnChart(ELEMENTS.slopeChart);
@@ -248,7 +249,8 @@ function clearMarkers() {
     results_container = [];
     divisionVerticies = [];
     al.clearChart();
-    al2.clearChart();
+    //FIXME: why this does not work?
+    //al2.clearChart();
 }
 
 function updateElevation() {
@@ -474,7 +476,66 @@ function ModeButtonCreator() {
     a.push(new button("Start Over", function () {
         clearMarkers()
     }));
+    a.push(new button("Permalink", function () {
+        saveToHistory()
+    }));
     return a
+}
+
+function getCurrentState() {
+    var state = {
+        markers: [],
+        bounds: {
+            south: map.getBounds().getSouthWest().lat(),
+            north: map.getBounds().getNorthEast().lat(),
+            east: map.getBounds().getNorthEast().lng(),
+            west: map.getBounds().getSouthWest().lng(),
+        }
+    }
+
+    for (var x = 0; x < marker_container.length; x++) {
+        var marker = marker_container[x];
+        var pos = {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng(),
+        }
+        state.markers.push(pos);
+    }
+
+    return state;
+}
+
+function saveToHistory() {
+    var serialized = JSON.stringify(getCurrentState());
+
+    serialized = serialized.replace(/"/g, "|");
+    location.hash = serialized; 
+}
+
+function loadFromHistory() {
+    clearMarkers();
+    if (location.hash == "" || location.hash == "#") {
+        // nothing to load
+        return;
+    }
+    var serialized = location.hash.toString();
+    serialized = serialized.substring(1);
+    serialized = serialized.replace(/\|/g, "\"");
+    var state = JSON.parse(serialized);
+    if (state.markers) {
+        for (var x = 0; x < state.markers.length; x++) {
+            var lat = state.markers[x].lat;
+            var lng = state.markers[x].lng;
+
+            var latlng = new google.maps.LatLng(lat, lng);
+            addMarker(latlng);
+        }
+    }
+    if (state.bounds) {
+        var sw = new google.maps.LatLng(state.bounds.south, state.bounds.west);
+        var ne = new google.maps.LatLng(state.bounds.north, state.bounds.east);
+        map.fitBounds(new google.maps.LatLngBounds(sw, ne));
+    }
 }
 
 function directionsCenter(a) {
@@ -518,7 +579,8 @@ function init() {
         arguments.callee.done = !0;
         _timer && clearInterval(_timer);
         initializeUI();
-        initComplete = !0
+        initComplete = 1
+        loadFromHistory();
     }
 }
 document.addEventListener && document.addEventListener("DOMContentLoaded", init, !1);
