@@ -21,10 +21,10 @@ var ModeSpecificControls, clckTimeOut = null,
     polyline_container = [],
     directionsQueue = [],
     mousemarker = null,
-    chart = null,
-    al = null,
-    al2 = null,
+    elevationChart = null,
+    slopeChart = null,
     divisionVerticies = [];
+var slopeToElevationIndex = [];
 
 var CONFIG = {
     MAP_SETTINGS : {
@@ -64,8 +64,16 @@ function initializeUI() {
     // "skip" && "generate permalink"
     new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
     google.maps.event.addDomListener(ELEMENTS.travelModeSelect, "change", updateTravelMode);
-    al = new rfbm.areaLine(ELEMENTS.elevationChart);
-    al2 = new google.visualization.ColumnChart(ELEMENTS.slopeChart);
+
+    elevationChart = new google.visualization.AreaChart(ELEMENTS.elevationChart);
+    google.visualization.events.addListener(elevationChart, 'onmouseover', elevationMouseOver);
+    google.visualization.events.addListener(elevationChart, 'onmouseout', elevationMouseOut);
+
+    slopeChart = new google.visualization.ColumnChart(ELEMENTS.slopeChart);
+    google.visualization.events.addListener(slopeChart, 'onmouseover', slopeMouseOver);
+    google.visualization.events.addListener(slopeChart, 'onmouseout', slopeMouseOut);
+    
+
     updateTravelMode();
 }
 
@@ -75,6 +83,38 @@ function findDistance(latLng1, latLng2) {
         Math.pow(latLng1.lat() - latLng2.lat(), 2) + 
         Math.pow(latLng1.lng() - latLng2.lng(), 2)
     );
+}
+
+function elevationMouseOver(e) {
+    elevationChart.setSelection([e]);
+    if (mousemarker == null) {
+        mousemarker = new google.maps.Marker({
+            map: map,
+            icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+        });
+    }
+    mousemarker.setPosition(elevations[e.row].location);
+}
+
+function elevationMouseOut(e) {
+    elevationChart.setSelection([]);
+    mousemarker.setMap(null);
+    mousemarker = null;
+}
+
+function slopeMouseOver(e) {
+    var selection = [];
+    var start = slopeToElevationIndex[e.row];
+    var end = slopeToElevationIndex[e.row + 1]
+    for (var x = start; x < end; x++) {
+        selection.push({'row': x, 'column': 1});
+    }
+    elevationChart.setSelection(selection);
+
+}
+
+function slopeMouseOut(e) {
+    elevationChart.setSelection([])
 }
 
 function directionsLoaded(directions_result) {
@@ -248,9 +288,9 @@ function clearMarkers() {
     polyline_container = [];
     results_container = [];
     divisionVerticies = [];
-    al.clearChart();
+    //al.clearChart();
     //FIXME: why this does not work?
-    //al2.clearChart();
+    //slopeChart.clearChart();
 }
 
 function updateElevation() {
@@ -281,8 +321,8 @@ function updateElevation() {
         elevationService.getElevationAlongPath(query, plotElevationCallback)
     } else {
         ELEMENTS.totalAscent.textContent = "total ascent: N/A"
-        al.clearChart()
-        al2.clearChart()
+        elevationChart.clearChart()
+        slopeChart.clearChart()
     }
 }
 
@@ -324,17 +364,14 @@ function plotElevation(elevations) {
         c.addColumn("number", "Elevation");
         for (var e = 0; e < elevations.length; e++) {
             var distance = e / elevations.length * totdistance / 1000.0;
-            c.addRow([distance, elevations[e].elevation]);
+            c.addRow([Math.round(distance * 100)/100,
+                      Math.round(elevations[e].elevation)]);
         }
 
-        al.draw(c, {
-            width: 611,
+        elevationChart.draw(c, {
+            width: 800,
             height: 250,
-            yTitle: "Elevation (m)",
-            xTitle: "Distance (km)",
-            mouseClick: function () {
-                elevationClick();
-            }
+            series: [{visibleInLegend: false}],
         })
 }
 
@@ -345,16 +382,20 @@ function plotSlope(elevations) {
         c2.addColumn("string", "Dist");
         c2.addColumn("number", "Slope");
         distSkip = 1 + Math.floor(elevations.length * 1000 / totdistance);
+
+        slopeToElevationIndex = [0]
+
         for (var e = distSkip; e < elevations.length; e+=distSkip) {
+            slopeToElevationIndex.push(e);
             var distance = e / elevations.length * totdistance / 1000;
             elediff = elevations[e].elevation - elevations[e-distSkip].elevation;
             slope = elediff / (distSkip * totdistance / elevations.length);
-            c2.addRow([Math.round(distance) + "", slope * 100]);
+            c2.addRow([distance.toFixed(0), Math.round(slope * 100 * 10) / 10]);
         }
-        al2.draw(c2, {
-            width: 811,
+        slopeChart.draw(c2, {
+            width: 800,
             height: 250,
-            series: [{color: 'black', visibleInLegend: false}],
+            series: [{visibleInLegend: false}],
         })
 }
 
@@ -394,8 +435,8 @@ function plotElevationCallback(a, b) {
         plotSlope(elevations)
         updateAscentInfo(elevations)
     } else {
-        al.clearChart();
-        al2.clearChart();
+        elevationChart.clearChart();
+        slopeChart.clearChart();
         ELEMENTS.totalAscent.textContent = "error retrieving elevation info!";
     }
 }
@@ -565,7 +606,7 @@ function findNearestVertex(a) {
 }
 
 function elevationClick() {
-    var selection = al.getSelection();
+    var selection = elevationChart.getSelection();
     var vertex = findNearestVertex(selection.location);
     addSplitMarker(vertex);
     divisionVerticies.push(vertex);
