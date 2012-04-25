@@ -48,6 +48,7 @@ var ELEMENTS = {
     totalDistance: document.getElementById("total_distance"),
     totalAscent: document.getElementById("total_ascent"),
     estimatedTime: document.getElementById("estimated_time"),
+    permalinkEdit: document.getElementById("permalink"),
 }
 
 function updateTravelMode() {
@@ -62,8 +63,9 @@ function updateTravelMode() {
 function initializeUI() {
     map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
     google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng);});
+    google.maps.event.addListener(map, "bounds_changed", function (event) {refreshPermalink()});
 
-    // "skip" && "generate permalink"
+    // "skip"
     new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
     google.maps.event.addDomListener(ELEMENTS.travelModeSelect, "change", updateTravelMode);
 
@@ -193,6 +195,7 @@ function clickMarker(marker) {
             }
         }
     }
+    refreshPermalink();
 }
 
 function dragendMarker(marker) {
@@ -214,6 +217,7 @@ function dragendMarker(marker) {
         }
     }
 
+    refreshPermalink();
 }
 
 
@@ -239,7 +243,8 @@ function addMarker(position) {
     });
     google.maps.event.addListener(marker, "dragend", function () {
         dragendMarker(marker);
-    });
+    }
+    );
     var numMarkers = marker_container.length;
     if (numMarkers > 1) { 
         if (initComplete) {
@@ -248,6 +253,7 @@ function addMarker(position) {
             directionsQueue.push([marker_container[numMarkers - 2], marker_container[numMarkers - 1]])
         }
     }
+    refreshPermalink();
 }
 
 function directionsQueueProcessor() {
@@ -301,6 +307,7 @@ function clearMarkers() {
     //al.clearChart();
     //FIXME: why this does not work?
     //slopeChart.clearChart();
+    refreshPermalink();
 }
 
 function updateElevation() {
@@ -547,33 +554,44 @@ function ModeButtonCreator() {
     a.push(new button("Start Over", function () {
         clearMarkers()
     }));
-    a.push(new button("Permalink", function () {
-        saveToHistory()
-    }));
     return a
 }
 
 function getCurrentState() {
+
     var state = {
         markers: [],
-        bounds: {
-            south: map.getBounds().getSouthWest().lat(),
-            north: map.getBounds().getNorthEast().lat(),
-            east: map.getBounds().getNorthEast().lng(),
-            west: map.getBounds().getSouthWest().lng(),
-        }
-    }
+        bounds: null,
+    };
 
     for (var x = 0; x < marker_container.length; x++) {
         var marker = marker_container[x];
         var pos = {
             lat: marker.getPosition().lat(),
             lng: marker.getPosition().lng(),
-        }
+        };
         state.markers.push(pos);
-    }
+    };
+
+    // Note: map.getBounds() might return undefined
+    // if the map is not fully loaded yet
+    if (map.getBounds()) {
+        state.bounds = {
+            south: map.getBounds().getSouthWest().lat(),
+            north: map.getBounds().getNorthEast().lat(),
+            east: map.getBounds().getNorthEast().lng(),
+            west: map.getBounds().getSouthWest().lng(),
+        };
+    };
 
     return state;
+}
+
+function refreshPermalink() {
+    var serialized = JSON.stringify(getCurrentState());
+
+    serialized = serialized.replace(/"/g, "|");
+    ELEMENTS.permalinkEdit.value = location.origin + location.pathname + '#' + serialized;
 }
 
 function saveToHistory() {
@@ -583,16 +601,14 @@ function saveToHistory() {
     location.hash = serialized; 
 }
 
-function loadFromHistory() {
+function setCurrentState(state) {
     clearMarkers();
-    if (location.hash == "" || location.hash == "#") {
-        // nothing to load
-        return;
+    if (state == null) {
+      refreshPermalink();
+      return;
     }
-    var serialized = location.hash.toString();
-    serialized = serialized.substring(1);
-    serialized = serialized.replace(/\|/g, "\"");
-    var state = JSON.parse(serialized);
+
+    // resume markers
     if (state.markers) {
         for (var x = 0; x < state.markers.length; x++) {
             var lat = state.markers[x].lat;
@@ -602,11 +618,27 @@ function loadFromHistory() {
             addMarker(latlng);
         }
     }
+
+    //resume viewport
     if (state.bounds) {
         var sw = new google.maps.LatLng(state.bounds.south, state.bounds.west);
         var ne = new google.maps.LatLng(state.bounds.north, state.bounds.east);
         map.fitBounds(new google.maps.LatLngBounds(sw, ne));
     }
+
+    refreshPermalink();
+}
+
+function loadFromHistory() {
+    if (location.hash == "" || location.hash == "#") {
+        // nothing to load
+        return;
+    }
+    var serialized = location.hash.toString();
+    serialized = serialized.substring(1);
+    serialized = serialized.replace(/\|/g, "\"");
+    var state = JSON.parse(serialized);
+    setCurrentState(state);
 }
 
 function directionsCenter(a) {
@@ -647,6 +679,7 @@ function init() {
         loadFromHistory();
     }
 }
+
 document.addEventListener && document.addEventListener("DOMContentLoaded", init, !1);
 if (/WebKit/i.test(navigator.userAgent)) var _timer = setInterval(function () {
     /loaded|complete/.test(document.readyState) && init()
