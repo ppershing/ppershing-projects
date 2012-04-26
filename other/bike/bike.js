@@ -19,7 +19,6 @@ var ModeSpecificControls, clckTimeOut = null,
     travelMode = google.maps.DirectionsTravelMode.DRIVING,
     results_container = [],
     polyline_container = [],
-    directionsQueue = [],
     mousemarker = null,
     elevationChart = null,
     slopeChart = null,
@@ -155,7 +154,7 @@ function directionsLoaded(directions_result) {
     });
     for (b = a = 0; b < polyline_container.length; b++) b in polyline_container && (a += polyline_container[b].distance);
     ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a) + " km";
-    directionsQueue.length ? window.setTimeout(directionsQueueProcessor(), 1E3) : polyline_container.length == marker_container.length - 1 && updateElevation()
+    updateElevation()
 }
 
 function directionsResultLatLngs(a) {
@@ -171,11 +170,12 @@ function directionsResultLatLngs(a) {
 }
 
 function clickMarker(marker) {
-    var b, c;
+    var b = -1, c = -1;
     var marker_index = marker_container.indexOf(marker);
     if (marker_index != 0 && marker_index < marker_container.length - 1) {
-        b = marker_container[marker_index - 1]
-        c = marker_container[marker_index + 1]
+        b = marker_index - 1;
+        // c is shifted!
+        c = marker_index;
     }
     marker_container.splice(marker_index, 1);
     marker.setMap(null);
@@ -191,7 +191,9 @@ function clickMarker(marker) {
             results_container.splice(marker_index, 1); 
             if (marker_index != 0) {
                 polyline_container[marker_index - 1].setMap(null);
-                directionsQueueProcessor(b, c);
+                if (b != -1) {
+                    findDirections(b, c);
+                }
             }
         }
     }
@@ -199,22 +201,22 @@ function clickMarker(marker) {
 }
 
 function dragendMarker(marker) {
-    if (marker_container.length > 0) {
-        marker_index = marker_container.indexOf(marker);
-        if (marker_index == 0) {
-            (polyline = polyline_container.splice(0, 1), polyline[0].setMap(null), directionsQueueProcessor(marker_container[0], marker_container[marker_index + 1]))
-        } else {
-            if (marker_index == marker_container.length - 1) {
-                polyline = polyline_container.splice(-1, 1);
-                polyline[0].setMap(null);
-                directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
-            } else {
-                polyline_container[marker_index - 1].setMap(null);
-                polyline_container[marker_index].setMap(null);
-                directionsQueueProcessor(marker_container[marker_index - 1], marker_container[marker_index]);
-                directionsQueueProcessor(marker_container[marker_index], marker_container[marker_index + 1]);
-            }
-        }
+    utils.assert(marker_container.length > 0);
+
+    marker_index = marker_container.indexOf(marker);
+    if (marker_index == 0) {
+        polyline = polyline_container.splice(0, 1);
+        polyline[0].setMap(null);
+        findDirections(0, marker_index + 1);
+    } else if (marker_index == marker_container.length - 1) {
+        polyline = polyline_container.splice(-1, 1);
+        polyline[0].setMap(null);
+        findDirections(marker_index - 1, marker_index);
+    } else {
+        polyline_container[marker_index - 1].setMap(null);
+        polyline_container[marker_index].setMap(null);
+        findDirections(marker_index - 1, marker_index);
+        findDirections(marker_index, marker_index + 1);
     }
 
     refreshPermalink();
@@ -246,42 +248,37 @@ function addMarker(position) {
     }
     );
     var numMarkers = marker_container.length;
-    if (numMarkers > 1) { 
-        if (initComplete) {
-            directionsQueueProcessor(marker_container[numMarkers - 2], marker_container[numMarkers - 1])
-        } else {
-            directionsQueue.push([marker_container[numMarkers - 2], marker_container[numMarkers - 1]])
-        }
+    if (numMarkers > 1) {
+        findDirections(numMarkers - 2, numMarkers - 1);
     }
     refreshPermalink();
 }
 
-function directionsQueueProcessor() {
-    arguments.length && directionsQueue.push(arguments);
-    directionsQueue.length > 0 ? (request = directionsQueue.shift()) ? findDirections(request[0], request[1]) : findDirections() : findDirections()
-}
+function findDirections(x, y) {
+    utils.assert(x >= 0);
+    utils.assert(x < marker_container.length);
+    utils.assert(y >= 0);
+    utils.assert(y < marker_container.length);
 
-function findDirections() {
-    window._fd += 1;
-    if (arguments.length > 1) {
-        start_point = arguments[0].getPosition();
-        end_point = arguments[1].getPosition();
-    } else {
-        start_point = marker_container[marker_container.length - 2].getPosition();
-        end_point = marker_container[marker_container.length - 1].getPosition();
-    }
+    var start_point = marker_container[x].getPosition();
+    var end_point = marker_container[y].getPosition();
     directionsService.route({
         origin: start_point,
         destination: end_point,
         travelMode: travelMode,
         avoidHighways: true
     }, function (directions_result, directions_status) {
+        if (x >= marker_container.length ||
+            y >= marker_container.length || 
+            start_point != marker_container[x].getPosition() ||
+            end_point != marker_container[y].getPosition()) {
+          // this is a stale callback, skip the results! 
+          return;
+        }
         if (directions_status == "OK") {
             directionsLoaded(directions_result);
         } else if (directions_status == "UNKNOWN_ERROR") {
-            // FIXME: WTF is this???
-            for (t = 0; polyline_container[t] != void 0 && t < polyline_container.length - 1; t++);
-            marker_container[t] == void 0 ? directionsQueueProcessor(marker_container[t], marker_container[t + 1]) : directionsQueueProcessor(marker_container[marker_container.length - 2], marker_container[marker_container.length - 1])
+            // FIXME: What to do?
         } else {
             // FIXME: really this is the only case?
             alert("The last waypoint could not be added to the map (bike routing outside US?.");
