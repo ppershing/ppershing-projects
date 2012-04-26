@@ -558,6 +558,8 @@ function ModeButtonCreator() {
 }
 
 function getCurrentState() {
+    // by default use 6 digits
+    var PRECISION = 6;
 
     var state = {
         markers: [],
@@ -567,8 +569,8 @@ function getCurrentState() {
     for (var x = 0; x < marker_container.length; x++) {
         var marker = marker_container[x];
         var pos = {
-            lat: marker.getPosition().lat(),
-            lng: marker.getPosition().lng(),
+            lat: utils.round(marker.getPosition().lat(), PRECISION),
+            lng: utils.round(marker.getPosition().lng(), PRECISION),
         };
         state.markers.push(pos);
     };
@@ -577,10 +579,10 @@ function getCurrentState() {
     // if the map is not fully loaded yet
     if (map.getBounds()) {
         state.bounds = {
-            south: map.getBounds().getSouthWest().lat(),
-            north: map.getBounds().getNorthEast().lat(),
-            east: map.getBounds().getNorthEast().lng(),
-            west: map.getBounds().getSouthWest().lng(),
+            south: utils.round(map.getBounds().getSouthWest().lat(), PRECISION),
+            north: utils.round(map.getBounds().getNorthEast().lat(), PRECISION),
+            east: utils.round(map.getBounds().getNorthEast().lng(), PRECISION),
+            west: utils.round(map.getBounds().getSouthWest().lng(), PRECISION),
         };
     };
 
