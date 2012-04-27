@@ -311,6 +311,22 @@ function geocode(index) {
       });
 }
 
+function createModeSelector(selected_mode) {
+  var select = document.createElement("select");
+  options = [ ["line", "Straight link"],
+              ["walk", "Walk"],
+              ["car", "Car"],
+            ]
+  for (var i=0; i<options.length; i++) {
+    var option = document.createElement("option");
+    option.selected = (selected_mode == options[i][0]);
+    option.value = options[i][0];
+    option.textContent=options[i][1];
+    select.appendChild(option);
+  }
+  return select;
+}
+
 function findDirections(x) {
     var y = x + 1; // next point
     utils.assert(x >= 0 && x < sections.length);
