@@ -12,7 +12,6 @@ var geocoderService = new google.maps.Geocoder;
 google.load("visualization", "1", {
     packages: ["corechart"]
 });
-var storage = new utils.ObjectStorage(window.localStorage);
 
 var travelMode = google.maps.DirectionsTravelMode.DRIVING,
     mousemarker = null,
@@ -35,10 +34,6 @@ var CONFIG = {
         SPEED_KM_FLAT: 22 /*km/h*/,
         ASCENT_METRES_MIN: 15 /*m/min*/,
     },
-    /** storage keys */
-    STORAGE : {
-      SAVED_TRIPS : "saved_trips",
-    }
 };
 
 var ELEMENTS = {
@@ -97,7 +92,7 @@ function initializeUI() {
     new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
     ELEMENTS.travelModeSelect.addEventListener("change", updateTravelMode);
     ELEMENTS.saveTripButton.addEventListener("click", 
-        function() {addSavedTrip({name: ELEMENTS.saveTripTextName.value, data:getCurrentState()});}
+        function() {saved_trips.add({name: ELEMENTS.saveTripTextName.value, data:getCurrentState()});}
       );
 
     elevationChart = new google.visualization.AreaChart(ELEMENTS.elevationChart);
@@ -752,71 +747,14 @@ function init() {
           clearInterval(_timer);
         };
 
-        if (storage.getItem(CONFIG.STORAGE.SAVED_TRIPS) == null) {
-          storage.setItem(CONFIG.STORAGE.SAVED_TRIPS, []);
-        }
-
         initializeUI();
         initComplete = 1
         loadFromHistory();
-        refreshSavedTrips();
+        saved_trips.refreshOnPage();
         window.onhashchange = function () { loadFromHistory(); };
     }
 }
 
-function removeSavedTrip(id) {
-  var data = storage.getItem(CONFIG.STORAGE.SAVED_TRIPS);
-  data.splice(id,1);
-  storage.setItem(CONFIG.STORAGE.SAVED_TRIPS, data);
-  refreshSavedTrips();
-}
-
-
-function addSavedTrip(trip_data) {
-  var data = storage.getItem(CONFIG.STORAGE.SAVED_TRIPS);
-  data.push(trip_data);
-  storage.setItem(CONFIG.STORAGE.SAVED_TRIPS, data);
-  refreshSavedTrips();
-}
-
-function refreshSavedTrips() {
-    var rootElement = ELEMENTS.savedList;
-
-    // Beware, indexes are shifting!
-    while (rootElement.children.length) {
-      rootElement.removeChild(rootElement.children[0]);
-    }
-
-    var results = storage.getItem(CONFIG.STORAGE.SAVED_TRIPS);
-    var len = results.length;
-    // Seems strange to use one more layer of functions?
-    // Then refer to
-    // http://perplexed.co.uk/559_javascript_lambda_functions_and_closures.htm
-    var delete_onclick = function(id) {
-      return function() {
-        removeSavedTrip(id);
-        refreshSavedTrips();
-      };
-    };
-    for (var i = 0; i < len; ++i) {
-      var row = results[i];
-      // the entire entry
-      var entry = document.createElement("div");
-      var delete_button = document.createElement("input");
-      var link = document.createElement("a");
-
-      delete_button.type = "button";
-      delete_button.value = "X";
-      delete_button.onclick = delete_onclick(i);
-
-      link.href = getPermalink(results[i].data);
-      link.textContent = row.name;
-
-      entry.appendChild(delete_button);
-      entry.appendChild(link);
-      rootElement.appendChild(entry);
-    };
-}
 document.addEventListener && document.addEventListener("DOMContentLoaded", init, !1);
 if (/WebKit/i.test(navigator.userAgent)) var _timer = setInterval(function () {
     /loaded|complete/.test(document.readyState) && init()
