@@ -13,10 +13,9 @@ google.load("visualization", "1", {
     packages: ["corechart"]
 });
 
-var mousemarker = null,
-    elevationChart = null,
-    slopeChart = null,
-    divisionVerticies = [];
+var mousemarker = null;
+var elevationChart = null;
+var slopeChart = null;
 
 var sections = [];
 
@@ -86,7 +85,7 @@ function refreshDirections() {
 
 function initializeUI() {
     map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
-    google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng);});
+    google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng, sections.length);});
     google.maps.event.addListener(map, "bounds_changed", function (event) {refreshPermalink()});
 
     // "skip"
@@ -145,10 +144,10 @@ function slopeMouseOver(e) {
 }
 
 function elevationClick() {
-    var vertex = findNearestVertex(elevations[elevationChartLastPos].location);
-    addSplitMarker(vertex);
-    divisionVerticies.push(vertex);
-    return [vertex, v]
+    var nearest = findNearestVertex(elevations[elevationChartLastPos].location);
+    if (nearest) {
+        addMarker(nearest[0], nearest[1] + 1);
+    }
 }
 
 function slopeMouseOut(e) {
@@ -175,9 +174,8 @@ function directionsLoaded(marker_index, result) {
     sections[marker_index].route = result;
 
     google.maps.event.addListener(sections[marker_index].polyline, "click", function (a) {
-        vertex = findNearestVertex(a.latLng);
-        addSplitMarker(vertex);
-        divisionVerticies.push(vertex);
+        var nearest = findNearestVertex(a.latLng);
+        addMarker(nearest[0], nearest[1] + 1);
     });
     var a = totalDistance();
     ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a / 1000) + " km";
@@ -236,7 +234,7 @@ function dragendMarker(marker) {
 }
 
 
-function addMarker(position) {
+function addMarker(position, index) {
     if (!position) return;
 
     var marker = new google.maps.Marker({
@@ -255,18 +253,23 @@ function addMarker(position) {
     var section = {
         marker: marker,
         polyline: new google.maps.Polyline(),
-        travelMode: (sections.length > 0) ? 
-                sections[sections.length - 1].travelMode :
+        travelMode: (index > 0) ? 
+                sections[index - 1].travelMode :
                 CONFIG.DEFAULT_TRAVEL_MODE,
         geocode: null,
         route: null,
     };
-
-    sections.push(section);
-
-    if (sections.length > 1) {
-        findDirections(sections.length - 2);
+    if (index != sections.length) {
+        sections.splice(index, 0, section);
+    } else {
+        sections.push(section);
     }
+
+    if (index > 0) {
+        findDirections(index - 1);
+    }
+    findDirections(index);
+
     refreshPermalink();
 
     geocode(sections.length - 1);
@@ -371,7 +374,6 @@ function clearMarkers() {
         sections[x].polyline.setMap(null);
     }
     sections = [];
-    divisionVerticies = [];
     // Due to some unknown reason it might be null even after initialization
     elevationChart.clearChart();
     slopeChart.clearChart();
@@ -411,32 +413,6 @@ function updateElevation() {
         elevationChart.clearChart()
         slopeChart.clearChart()
     }
-}
-
-function addSplitMarker(a) {
-    splitMarker = new google.maps.Marker({
-        position: a,
-        map: map,
-        draggable: true,
-        clickable: true,
-        oldPosition: a,
-        icon: "http://labs.google.com/ridefinder/images/mm_20_white.png"
-    });
-    google.maps.event.addListener(splitMarker, "drag", function (a) {
-        oldPosition = this.oldPosition;
-        newPosition = findNearestVertex(a.latLng);
-        this.setPosition(newPosition);
-        vertexIndex = divisionVerticies.indexOf(oldPosition);
-        this.oldPosition = divisionVerticies[vertexIndex] = newPosition
-    });
-    google.maps.event.addListener(splitMarker, "dragend", function () {
-    });
-    google.maps.event.addListener(splitMarker, "click", function () {
-        i = divisionVerticies.indexOf(this.getPosition());
-        divisionVerticies.splice(i, 1);
-        this.setMap(null);
-    });
-    return splitMarker
 }
 
 function totalDistance() {
@@ -629,7 +605,8 @@ MapControl.prototype.setDropInnerStyle = function (a) {
 function ModeButtonCreator() {
     var a = [];
     a.push(new button("Start Over", function () {
-        clearMarkers()
+        clearMarkers();
+        location.hash=""; //clear
     }));
     return a
 }
@@ -697,7 +674,7 @@ function setCurrentState(state) {
             var lng = state.markers[x].lng;
 
             var latlng = new google.maps.LatLng(lat, lng);
-            addMarker(latlng);
+            addMarker(latlng, sections.length);
         }
     }
 
@@ -731,22 +708,29 @@ function directionsCenter(a) {
 
 
 function findNearestVertex(a) {
-    var verticies = [];
-    for (path = 0; path < sections.length; path++) {
-        var latLngs = sections[path].polyline.getPath();
-        verticies = verticies.concat(latLngs.getArray());
-    }
     var smDelta = 100;
-    var distance = 0;
-    var closestVertex = null;
-    for (v = 0; v < verticies.length; v++) {
-        distance = findDistance(a, verticies[v]);
-        if (distance < smDelta) {
-            smDelta = distance;
-            closestVertex = verticies[v];
+    var closest = null;
+
+    for (path = 0; path < sections.length - 1; path++) {
+        var latLngs = sections[path].polyline.getPath();
+        var verticies = latLngs.getArray();
+        for (var i = 0; i < verticies.length - 1; i++) {
+            var p1 = verticies[i];
+            var p2 = verticies[i+1];
+            var step = 10 / p1.distanceTo(p2); // each 10m
+            // this interpolates between points (for straight lines)
+            for (var t = 0; t < 1; t+= step) {
+              var p = new google.maps.LatLng(p1.lat() * t + p2.lat() * (1-t),
+                                             p1.lng() * t + p2.lng() * (1-t));
+              var distance = findDistance(a, p);
+              if (distance < smDelta) {
+                  smDelta = distance;
+                  closest = [p, path];
+              }
+            }
         }
     }
-    return closestVertex
+    return closest;
 }
 
 
