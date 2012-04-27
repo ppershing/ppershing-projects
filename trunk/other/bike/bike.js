@@ -13,8 +13,7 @@ google.load("visualization", "1", {
     packages: ["corechart"]
 });
 
-var travelMode = google.maps.DirectionsTravelMode.DRIVING,
-    mousemarker = null,
+var mousemarker = null,
     elevationChart = null,
     slopeChart = null,
     divisionVerticies = [];
@@ -34,10 +33,10 @@ var CONFIG = {
         SPEED_KM_FLAT: 22 /*km/h*/,
         ASCENT_METRES_MIN: 15 /*m/min*/,
     },
+    DEFAULT_TRAVEL_MODE: google.maps.DirectionsTravelMode.DRIVING,
 };
 
 var ELEMENTS = {
-    travelModeSelect: document.getElementById("travel_mode_select"),
     mapCanvas: document.getElementById("map_canvas"),
     elevationChart: document.getElementById("elevation_chart"),
     slopeChart: document.getElementById("slope_chart"),
@@ -49,15 +48,7 @@ var ELEMENTS = {
     saveTripButton: document.getElementById("save_trip_button"),
     saveTripTextName: document.getElementById("save_trip_name"),
     directionsPanel: document.getElementById("directions_panel"),
-}
-
-function updateTravelMode() {
-    switch (ELEMENTS.travelModeSelect.selectedIndex) {
-        case 0: travelMode = google.maps.DirectionsTravelMode.WALKING
-                break;
-        case 1: travelMode = google.maps.DirectionsTravelMode.DRIVING
-                break;
-    }
+    autoNameCheckbox: document.getElementById("auto_name_checkbox"),
 }
 
 function refreshDirections() {
@@ -74,13 +65,23 @@ function refreshDirections() {
       // the entire entry
       var entry = document.createElement("li");
       var label = document.createElement("span");
-      var select = createModeSelector("");
+      var select = createTravelModeSelect(sections[i].travelMode);
+      select.onchange = function(select, x) {
+        return function() {
+            sections[x].travelMode = select.value;
+            findDirections(x);
+        };
+      }(select, i);
       label.textContent = name;
 
       entry.appendChild(label);
       entry.appendChild(select);
       rootElement.appendChild(entry);
     };
+    if (ELEMENTS.autoNameCheckbox.checked && sections.length) {
+        ELEMENTS.saveTripTextName.value = sections[0].geocode + ' -> ' +
+            sections[sections.length-1].geocode;
+    }
 }
 
 function initializeUI() {
@@ -90,7 +91,6 @@ function initializeUI() {
 
     // "skip"
     new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
-    ELEMENTS.travelModeSelect.addEventListener("change", updateTravelMode);
     ELEMENTS.saveTripButton.addEventListener("click", 
         function() {saved_trips.add({name: ELEMENTS.saveTripTextName.value, data:getCurrentState()});}
       );
@@ -106,7 +106,6 @@ function initializeUI() {
     google.visualization.events.addListener(slopeChart, 'onmouseout', slopeMouseOut);
     plotSlope([]);
 
-    updateTravelMode();
 }
 
 // FIXME: what is the effect of this formula on latlongs?
@@ -156,49 +155,33 @@ function slopeMouseOut(e) {
     elevationChart.setSelection([])
 }
 
-function directionsLoaded(directions_result) {
+function directionsLoaded(marker_index, result) {
+    var latlngs = [];
+
+    for (var x = 0; x < result.steps.length; x++) {
+        for (var y = 0; y < result.steps[x].lat_lngs.length; y++) {
+            latlngs.push(result.steps[x].lat_lngs[y]);
+        }
+    }
+
     var a = {
-        path: directionsResultLatLngs(directions_result),
+        path: latlngs,
         strokeColor: "#0000CC",
         strokeOpacity: 0.4,
         map: map
-    },
-        b = [],
-        c = a.path[0];
-    for (marker_num = 0; marker_num < sections.length; marker_num++) {
-        b.push([findDistance(c, sections[marker_num].marker.getPosition()), marker_num]);
-    }
-    b.sort(function (a, b) {
-        return a[0] - b[0]
-    });
-    var marker_index = b[0][1];
+    };
+
     sections[marker_index].polyline = new google.maps.Polyline(a);
-    sections[marker_index].polyline.distance = directions_result.routes[0].legs[0].distance.value / 1E3;
-    sections[marker_index].results = directions_result;
+    sections[marker_index].route = result;
 
     google.maps.event.addListener(sections[marker_index].polyline, "click", function (a) {
         vertex = findNearestVertex(a.latLng);
         addSplitMarker(vertex);
         divisionVerticies.push(vertex);
     });
-    var a = 0;
-    for (var x = 0; x < sections.length; x++) {
-        a += sections[x].polyline.distance;
-    }
-    ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a) + " km";
+    var a = totalDistance();
+    ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a / 1000) + " km";
     updateElevation()
-}
-
-function directionsResultLatLngs(a) {
-    var b = [];
-
-    for (x = 0; x < a.routes[0].legs[0].steps.length; x++) {
-        for (y = 0; y < a.routes[0].legs[0].steps[x].lat_lngs.length - 1; y++) {
-            b.push(a.routes[0].legs[0].steps[x].lat_lngs[y]);
-        }
-        b.push(a.routes[0].legs[0].steps[x].lat_lngs[y])
-    }
-    return b
 }
 
 function markerIndex(marker) {
@@ -217,10 +200,14 @@ function removeMarker(marker) {
     removed[0].marker.setMap(null);
 
     // Note: we erased 1 item!
-    if (marker_index != sections.length && marker_index != 0) {
-        sections[marker_index - 1].polyline.setMap(null);
-        findDirections(marker_index - 1);
-    }
+    if (marker_index != 0) {
+        if (marker_index == sections.length) {
+            sections[marker_index - 1].polyline.setMap(null);
+        } else {
+            findDirections(marker_index - 1);
+        }
+    };
+    refreshDirections();
     refreshPermalink();
 }
 
@@ -239,13 +226,11 @@ function dragendMarker(marker) {
             findDirections(marker_index - 1);
         }
     } else {
-        
-        sections[marker_index - 1].polyline.setMap(null);
-        sections[marker_index].polyline.setMap(null);
         findDirections(marker_index - 1);
         findDirections(marker_index);
     }
 
+    refreshDirections();
     refreshPermalink();
     geocode(marker_index);
 }
@@ -270,8 +255,11 @@ function addMarker(position) {
     var section = {
         marker: marker,
         polyline: new google.maps.Polyline(),
+        travelMode: (sections.length > 0) ? 
+                sections[sections.length - 1].travelMode :
+                CONFIG.DEFAULT_TRAVEL_MODE,
         geocode: null,
-        results: null,
+        route: null,
     };
 
     sections.push(section);
@@ -306,11 +294,11 @@ function geocode(index) {
       });
 }
 
-function createModeSelector(selected_mode) {
+function createTravelModeSelect(selected_mode) {
   var select = document.createElement("select");
-  options = [ ["line", "Straight link"],
-              ["walk", "Walk"],
-              ["car", "Car"],
+  options = [ ["STRAIGHT", "Straight link"],
+              [google.maps.DirectionsTravelMode.WALKING, "Walk"],
+              [google.maps.DirectionsTravelMode.DRIVING, "Car"],
             ]
   for (var i=0; i<options.length; i++) {
     var option = document.createElement("option");
@@ -324,17 +312,42 @@ function createModeSelector(selected_mode) {
 
 function findDirections(x) {
     var y = x + 1; // next point
-    utils.assert(x >= 0 && x < sections.length);
-    utils.assert(y >= 0 && y < sections.length);
+    utils.assert(x >= 0 && x < sections.length, "out of bounds");
+    if (sections[x].polyline) {
+        sections[x].polyline.setMap(null);
+    }
+    if (sections.length == y) {
+        // nothing to do (dummy segment at the end)
+        return;
+    }
 
     var start_point = sections[x].marker.getPosition();
     var end_point = sections[y].marker.getPosition();
+
+    var straight_result = {
+        steps: [{
+            lat_lngs: [start_point, end_point],
+        }],
+        distance: {
+            value: start_point.distanceTo(end_point),
+        },
+    };
+
+    if (sections[x].travelMode == "STRAIGHT") {
+        directionsLoaded(x, straight_result);
+        return;
+    }
+
     directionsService.route({
         origin: start_point,
         destination: end_point,
-        travelMode: travelMode,
+        travelMode: sections[x].travelMode,
         avoidHighways: true
     }, function (directions_result, directions_status) {
+        utils.assert(directions_result.routes.length == 1);
+        utils.assert(directions_result.routes[0].legs.length == 1);
+        var result = directions_result.routes[0].legs[0];
+
         if (x >= sections.length ||
             y >= sections.length || 
             start_point != sections[x].marker.getPosition() ||
@@ -343,13 +356,10 @@ function findDirections(x) {
           return;
         }
         if (directions_status == "OK") {
-            directionsLoaded(directions_result);
-        } else if (directions_status == "UNKNOWN_ERROR") {
-            // FIXME: What to do?
+            directionsLoaded(x, result);
         } else {
-            // FIXME: really this is the only case?
-            alert("The last waypoint could not be added to the map (bike routing outside US?.");
-            alert(directions_status);
+            // fallback to straight line in case of an error
+            directionsLoaded(x, straight_result);
         }
     });
     google.maps.event.trigger(map, "resize")
@@ -366,11 +376,13 @@ function clearMarkers() {
     elevationChart.clearChart();
     slopeChart.clearChart();
     refreshPermalink();
+    refreshDirections();
 }
 
 function updateElevation() {
     var track = [];
-    for (var segment = 0; segment < sections.length; segment++) {
+    // note, we do not want last section!
+    for (var segment = 0; segment < sections.length - 1; segment++) {
         var latLngs = sections[segment].polyline.getPath();
         for (var x = 0; x < latLngs.length; x++) {
             track.push(latLngs.getAt(x))
@@ -429,7 +441,7 @@ function addSplitMarker(a) {
 
 function totalDistance() {
     for (d = totdistance = 0; d < sections.length; d++) {
-        if (sections[d].results) totdistance += sections[d].results.routes[0].legs[0].distance.value;
+        if (sections[d].route) totdistance += sections[d].route.distance.value;
     }
     return totdistance;
 }
@@ -760,3 +772,13 @@ if (/WebKit/i.test(navigator.userAgent)) var _timer = setInterval(function () {
     /loaded|complete/.test(document.readyState) && init()
 }, 10);
 window.onload = init;
+
+google.maps.LatLng.prototype.distanceTo = function(a){ 
+  var e = Math, ra = e.PI/180; 
+  var b = this.lat() * ra, c = a.lat() * ra, d = b - c; 
+  var g = this.lng() * ra - a.lng() * ra;
+
+  var tmp = e.pow(e.sin(d/2), 2) + e.cos(b) * e.cos(c) * e.pow(e.sin(g/2), 2);
+  var f = 2 * e.asin(e.sqrt(tmp)); 
+  return f * 6378.137 * 1000; 
+}
