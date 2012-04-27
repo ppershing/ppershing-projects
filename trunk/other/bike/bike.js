@@ -1,3 +1,4 @@
+// vim: set sts=4: ts=4: sw=4: et
 /*
  (c) original file from: http://www.ridefreebikemaps.com/
  (c) PPershing (heavy edits)
@@ -9,10 +10,7 @@ var elevationService = new google.maps.ElevationService;
 google.load("visualization", "1", {
     packages: ["corechart"]
 });
-
-var sections = {
-    
-}
+var storage = new utils.ObjectStorage(window.localStorage);
 
 var marker_container = [];
 var ModeSpecificControls, clckTimeOut = null,
@@ -36,6 +34,10 @@ var CONFIG = {
     SPEED_SETTINGS : {
         SPEED_KM_FLAT: 22 /*km/h*/,
         ASCENT_METRES_MIN: 15 /*m/min*/,
+    },
+    /** storage keys */
+    STORAGE : {
+      SAVED_TRIPS : "saved_trips",
     }
 };
 
@@ -48,6 +50,9 @@ var ELEMENTS = {
     totalAscent: document.getElementById("total_ascent"),
     estimatedTime: document.getElementById("estimated_time"),
     permalinkEdit: document.getElementById("permalink"),
+    savedList: document.getElementById("saved_trips_list"),
+    saveTripButton: document.getElementById("save_trip_button"),
+    saveTripTextName: document.getElementById("save_trip_name"),
 }
 
 function updateTravelMode() {
@@ -66,17 +71,21 @@ function initializeUI() {
 
     // "skip"
     new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
-    google.maps.event.addDomListener(ELEMENTS.travelModeSelect, "change", updateTravelMode);
+    ELEMENTS.travelModeSelect.addEventListener("change", updateTravelMode);
+    ELEMENTS.saveTripButton.addEventListener("click", 
+        function() {addSavedTrip({name: ELEMENTS.saveTripTextName.value, data:getCurrentState()});}
+      );
 
     elevationChart = new google.visualization.AreaChart(ELEMENTS.elevationChart);
     google.visualization.events.addListener(elevationChart, 'onmouseover', elevationMouseOver);
     google.visualization.events.addListener(elevationChart, 'onmouseout', elevationMouseOut);
     google.visualization.events.addListener(elevationChart, 'select', elevationClick);
+    plotElevation([]);
 
     slopeChart = new google.visualization.ColumnChart(ELEMENTS.slopeChart);
     google.visualization.events.addListener(slopeChart, 'onmouseover', slopeMouseOver);
     google.visualization.events.addListener(slopeChart, 'onmouseout', slopeMouseOut);
-    
+    plotSlope([]);
 
     updateTravelMode();
 }
@@ -231,17 +240,10 @@ function addMarker(position) {
         map: map,
         draggable: true
     });
-    section = {
-        marker: marker,
-        polyline: null,
-        routing: null,
-        routingMode: null,
-    }
-    //sections.push(section);
 
     marker_container.push(marker);
     google.maps.event.addListener(marker, "click", function () {
-        clickMarker(marker);
+        removeMarker(marker);
     });
     google.maps.event.addListener(marker, "dragend", function () {
         dragendMarker(marker);
@@ -301,9 +303,9 @@ function clearMarkers() {
     polyline_container = [];
     results_container = [];
     divisionVerticies = [];
-    //al.clearChart();
-    //FIXME: why this does not work?
-    //slopeChart.clearChart();
+    // Due to some unknown reason it might be null even after initialization
+    elevationChart.clearChart();
+    slopeChart.clearChart();
     refreshPermalink();
 }
 
@@ -373,7 +375,7 @@ function totalDistance() {
 
 function plotElevation(elevations) {
         var totdistance = totalDistance();
-        var c = new google.visualization.DataTable;
+        var c = new google.visualization.DataTable();
         c.addColumn("number", "Distance");
         c.addColumn("number", "Elevation");
         for (var e = 0; e < elevations.length; e++) {
@@ -496,7 +498,7 @@ function MapControl(a, b, c, e) {
             g.appendChild(b);
             this.setTopInnerStyle(h);
             this.setTopMiddleStyle(b);
-            google.maps.event.addDomListener(b, "click", c[f].action);
+            b.addEventListener("click", c[f].action);
         }
         this.setTopContainerStyle(g);
         break;
@@ -504,7 +506,12 @@ function MapControl(a, b, c, e) {
         for (f = 0; f < c.length; f++) {
             h = document.createElement("div");
             h.appendChild(document.createTextNode(c[f].name));
-            c[f].id && h.setAttribute("id", c[f].id), g.appendChild(h), this.setDropInnerStyle(h), google.maps.event.addDomListener(h, "click", c[f].action);
+            if (c[f].id) {
+              h.setAttribute("id", c[f].id);
+            };
+            g.appendChild(h);
+            this.setDropInnerStyle(h);
+            h.addEventListener("click", c[f].action);
         }
         this.setDropContainerStyle(g)
     }
@@ -586,11 +593,14 @@ function getCurrentState() {
     return state;
 }
 
-function refreshPermalink() {
-    var serialized = JSON.stringify(getCurrentState());
-
+function getPermalink(state) {
+    var serialized = JSON.stringify(state);
     serialized = serialized.replace(/"/g, "|");
-    ELEMENTS.permalinkEdit.value = location.origin + location.pathname + '#' + serialized;
+    return location.origin + location.pathname + '#' + serialized;
+}
+
+function refreshPermalink() {
+    ELEMENTS.permalinkEdit.value = getPermalink(getCurrentState());
 }
 
 function saveToHistory() {
@@ -672,13 +682,75 @@ var initComplete = !1;
 function init() {
     if (!arguments.callee.done) {
         arguments.callee.done = !0;
-        _timer && clearInterval(_timer);
+        if (_timer) {
+          clearInterval(_timer);
+        };
+
+        if (storage.getItem(CONFIG.STORAGE.SAVED_TRIPS) == null) {
+          storage.setItem(CONFIG.STORAGE.SAVED_TRIPS, []);
+        }
+
         initializeUI();
         initComplete = 1
         loadFromHistory();
+        refreshSavedTrips();
+        window.onhashchange = function () { loadFromHistory(); };
     }
 }
 
+function removeSavedTrip(id) {
+  var data = storage.getItem(CONFIG.STORAGE.SAVED_TRIPS);
+  data.splice(id,1);
+  storage.setItem(CONFIG.STORAGE.SAVED_TRIPS, data);
+  refreshSavedTrips();
+}
+
+
+function addSavedTrip(trip_data) {
+  var data = storage.getItem(CONFIG.STORAGE.SAVED_TRIPS);
+  data.push(trip_data);
+  storage.setItem(CONFIG.STORAGE.SAVED_TRIPS, data);
+  refreshSavedTrips();
+}
+
+function refreshSavedTrips() {
+    var rootElement = ELEMENTS.savedList;
+
+    // Beware, indexes are shifting!
+    while (rootElement.children.length) {
+      rootElement.removeChild(rootElement.children[0]);
+    }
+
+    var results = storage.getItem(CONFIG.STORAGE.SAVED_TRIPS);
+    var len = results.length;
+    // Seems strange to use one more layer of functions?
+    // Then refer to
+    // http://perplexed.co.uk/559_javascript_lambda_functions_and_closures.htm
+    var delete_onclick = function(id) {
+      return function() {
+        removeSavedTrip(id);
+        refreshSavedTrips();
+      };
+    };
+    for (var i = 0; i < len; ++i) {
+      var row = results[i];
+      // the entire entry
+      var entry = document.createElement("div");
+      var delete_button = document.createElement("input");
+      var link = document.createElement("a");
+
+      delete_button.type = "button";
+      delete_button.value = "X";
+      delete_button.onclick = delete_onclick(i);
+
+      link.href = getPermalink(results[i].data);
+      link.textContent = row.name;
+
+      entry.appendChild(delete_button);
+      entry.appendChild(link);
+      rootElement.appendChild(entry);
+    };
+}
 document.addEventListener && document.addEventListener("DOMContentLoaded", init, !1);
 if (/WebKit/i.test(navigator.userAgent)) var _timer = setInterval(function () {
     /loaded|complete/.test(document.readyState) && init()
