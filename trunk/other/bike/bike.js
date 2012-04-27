@@ -69,6 +69,7 @@ function refreshDirections() {
         return function() {
             sections[x].travelMode = select.value;
             findDirections(x);
+            refreshPermalink();
         };
       }(select, i);
       label.textContent = name;
@@ -291,7 +292,7 @@ function geocode(index) {
         if (status == "OK") {
             sections[index].geocode = results[0].formatted_address;
         } else {
-            sections[index].geocode = null;
+            sections[index].geocode = "unknown";
         }
         refreshDirections();
       });
@@ -617,6 +618,7 @@ function getCurrentState() {
 
     var state = {
         markers: [],
+        travelmodes: [],
         bounds: null,
     };
 
@@ -627,6 +629,7 @@ function getCurrentState() {
             lng: utils.round(marker.getPosition().lng(), PRECISION),
         };
         state.markers.push(pos);
+        state.travelmodes.push(sections[x].travelMode);
     };
 
     // Note: map.getBounds() might return undefined
@@ -678,6 +681,14 @@ function setCurrentState(state) {
         }
     }
 
+    if (state.travelmodes) {
+        utils.assert(state.travelmodes.length == state.markers.length);
+        for (var x = 0; x < state.travelmodes.length; x++) {
+            sections[x].travelMode = state.travelmodes[x];
+            findDirections(x);
+        }
+    }
+
     //resume viewport
     if (state.bounds) {
         var sw = new google.maps.LatLng(state.bounds.south, state.bounds.west);
@@ -686,6 +697,7 @@ function setCurrentState(state) {
     }
 
     refreshPermalink();
+    refreshDirections();
 }
 
 function loadFromHistory() {
