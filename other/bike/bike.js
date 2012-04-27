@@ -7,6 +7,8 @@
 var map;
 var directionsService = new google.maps.DirectionsService;
 var elevationService = new google.maps.ElevationService;
+var geocoderService = new google.maps.Geocoder;
+
 google.load("visualization", "1", {
     packages: ["corechart"]
 });
@@ -17,6 +19,7 @@ var ModeSpecificControls, clckTimeOut = null,
     travelMode = google.maps.DirectionsTravelMode.DRIVING,
     results_container = [],
     polyline_container = [],
+    geocode_container = [],
     mousemarker = null,
     elevationChart = null,
     slopeChart = null,
@@ -53,6 +56,7 @@ var ELEMENTS = {
     savedList: document.getElementById("saved_trips_list"),
     saveTripButton: document.getElementById("save_trip_button"),
     saveTripTextName: document.getElementById("save_trip_name"),
+    directionsPanel: document.getElementById("directions_panel"),
 }
 
 function updateTravelMode() {
@@ -62,6 +66,28 @@ function updateTravelMode() {
         case 1: travelMode = google.maps.DirectionsTravelMode.DRIVING
                 break;
     }
+}
+
+function refreshDirections() {
+    var rootElement = ELEMENTS.directionsPanel;
+
+    // Beware, indexes are shifting!
+    while (rootElement.children.length) {
+      rootElement.removeChild(rootElement.children[0]);
+    }
+
+    for (var i = 0; i < marker_container.length; ++i) {
+      var name = geocode_container[i];
+
+      // the entire entry
+      var entry = document.createElement("li");
+      var label = document.createElement("span");
+
+      label.textContent = name;
+
+      entry.appendChild(label);
+      rootElement.appendChild(entry);
+    };
 }
 
 function initializeUI() {
@@ -178,33 +204,24 @@ function directionsResultLatLngs(a) {
     return b
 }
 
-function clickMarker(marker) {
+function removeMarker(marker) {
     var b = -1, c = -1;
     var marker_index = marker_container.indexOf(marker);
-    if (marker_index != 0 && marker_index < marker_container.length - 1) {
-        b = marker_index - 1;
-        // c is shifted!
-        c = marker_index;
-    }
+    utils.assert(marker_index != -1, "marker already deleted!");
+    utils.assert(marker_container.length == polyline_container.length);
+
     marker_container.splice(marker_index, 1);
+    geocode_container.splice(marker_index, 1);
+    results_container.splice(marker_index, 1);
+    polyline = polyline_container.splice(marker_index, 1);
+
     marker.setMap(null);
-    if (polyline_container.length) {
-        // Note: we erased 1 item!
-        if (marker_index == marker_container.length) {
-            polyline = polyline_container.splice(-1, 1);
-            polyline[0].setMap(null);
-            results_container.splice(-1, 1);
-        } else {
-            polyline = polyline_container.splice(marker_index, 1);
-            polyline[0].setMap(null);
-            results_container.splice(marker_index, 1); 
-            if (marker_index != 0) {
-                polyline_container[marker_index - 1].setMap(null);
-                if (b != -1) {
-                    findDirections(b, c);
-                }
-            }
-        }
+    polyline[0].setMap(null);
+
+    // Note: we erased 1 item!
+    if (marker_index != marker_container.length && marker_index != 0) {
+        polyline_container[marker_index - 1].setMap(null);
+        findDirections(marker_index - 1, marker_index);
     }
     refreshPermalink();
 }
@@ -214,13 +231,15 @@ function dragendMarker(marker) {
 
     marker_index = marker_container.indexOf(marker);
     if (marker_index == 0) {
-        polyline = polyline_container.splice(0, 1);
-        polyline[0].setMap(null);
-        findDirections(0, marker_index + 1);
+        polyline_container[0].setMap(null);
+        if (marker_container.length > 1) {
+            findDirections(0, 1);
+        }
     } else if (marker_index == marker_container.length - 1) {
-        polyline = polyline_container.splice(-1, 1);
-        polyline[0].setMap(null);
-        findDirections(marker_index - 1, marker_index);
+        polyline_container[marker_index-1].setMap(null);
+        if (marker_container.length > 1) {
+            findDirections(marker_index - 1, marker_index);
+        }
     } else {
         polyline_container[marker_index - 1].setMap(null);
         polyline_container[marker_index].setMap(null);
@@ -229,6 +248,7 @@ function dragendMarker(marker) {
     }
 
     refreshPermalink();
+    geocode(marker_index);
 }
 
 
@@ -242,6 +262,9 @@ function addMarker(position) {
     });
 
     marker_container.push(marker);
+    polyline_container.push(new google.maps.Polyline());
+    geocode_container.push(null);
+
     google.maps.event.addListener(marker, "click", function () {
         removeMarker(marker);
     });
@@ -254,7 +277,32 @@ function addMarker(position) {
         findDirections(numMarkers - 2, numMarkers - 1);
     }
     refreshPermalink();
+
+    geocode(numMarkers - 1);
 }
+
+function geocode(index) {
+    utils.assert(index >= 0 && index < marker_container.length);
+
+    var point = marker_container[index].getPosition();
+
+    geocoderService.geocode(
+      { location: point },
+      function(results, status) {
+        if (index >= marker_container.length ||
+            marker_container[index].getPosition() != point) {
+            // stale response, ignore
+            return;
+        }
+        if (status == "OK") {
+            geocode_container[index] = results[0].formatted_address;
+        } else {
+            geocode_container[index] = null;
+        }
+        refreshDirections();
+      });
+}
+
 
 function findDirections(x, y) {
     utils.assert(x >= 0);
