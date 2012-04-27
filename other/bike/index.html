@@ -3,17 +3,12 @@
         <div>
           Permalink: <input type="text" id="permalink" size="100"/>
           <br/>
-          <input type="checkbox" id="save_trip_auto_name" checked="yes"/>auto naming
+          <input type="checkbox" id="auto_name_checkbox" checked="yes"/>auto naming
           <input type="text" id="save_trip_name" size="40"/>
           <input type="button" id="save_trip_button" value="save"/>
         </div>
 
         <div style="width:200px; float:right; border=solid 1px;">
-            Directions:
-            <select id="travel_mode_select" name="Directions Mode">
-                <option>Directions Mode: walking</option>
-                <option selected="selected">Directions Mode: Driving</option>
-            </select>
             <div>
               Trip:
               <ul id="directions_panel"> </ul>
