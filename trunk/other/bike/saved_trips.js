@@ -5,6 +5,12 @@ var saved_trips = {
 
     rootElement: ELEMENTS.savedList,
 
+    init: function() {
+        if (this.storage.getItem(this.SAVED_TRIPS_KEY) == null) {
+            this.storage.setItem(this.SAVED_TRIPS_KEY, []);
+        };
+    },
+
     remove: function(id) {
         var data = this.storage.getItem(this.SAVED_TRIPS_KEY);
         data.splice(id,1);
@@ -57,8 +63,7 @@ var saved_trips = {
             rootElement.appendChild(entry);
         };
     }
-}
+};
 
-if (saved_trips.getItem(saved_trips.SAVED_TRIPS_KEY) == null) {
-  saved_trips.setItem(saved_trips.SAVED_TRIPS_KEY, []);
-}
+saved_trips.init();
+
