@@ -59,6 +59,6 @@ var saved_trips = {
     }
 }
 
-if (saved_trips.storage.getItem(saved_trips.SAVED_TRIPS_KEY) == null) {
+if (saved_trips.getItem(saved_trips.SAVED_TRIPS_KEY) == null) {
   saved_trips.setItem(saved_trips.SAVED_TRIPS_KEY, []);
 }
