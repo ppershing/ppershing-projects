@@ -48,6 +48,7 @@ var ELEMENTS = {
     saveTripTextName: document.getElementById("save_trip_name"),
     directionsPanel: document.getElementById("directions_panel"),
     autoNameCheckbox: document.getElementById("auto_name_checkbox"),
+    clearButton: document.getElementById("clear_button"),
 }
 
 function refreshDirections() {
@@ -89,8 +90,7 @@ function initializeUI() {
     google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng, sections.length);});
     google.maps.event.addListener(map, "bounds_changed", function (event) {refreshPermalink()});
 
-    // "skip"
-    new MapControl(map, "top", ModeButtonCreator(), google.maps.ControlPosition.RIGHT);
+    ELEMENTS.clearButton.addEventListener("click", clearMarkers);
     ELEMENTS.saveTripButton.addEventListener("click", 
         function() {saved_trips.add({name: ELEMENTS.saveTripTextName.value, data:getCurrentState()});}
       );
@@ -380,6 +380,7 @@ function clearMarkers() {
     slopeChart.clearChart();
     refreshPermalink();
     refreshDirections();
+    ELEMENTS.saveTripTextName.value = "";
 }
 
 function updateElevation() {
@@ -532,84 +533,6 @@ function button(a, b, c) {
     this.name = a;
     this.id = c;
     this.action = b
-}
-
-function MapControl(a, b, c, e) {
-    var g = document.createElement("div"),
-        h;
-    switch (b) {
-    case "top":
-        for (var f = 0; f < c.length; f++) {
-            h = document.createElement("div");
-            h.appendChild(document.createTextNode(c[f].name));
-            c[f].id && h.setAttribute("id", c[f].id);
-            b = document.createElement("div");
-            b.appendChild(h);
-            g.appendChild(b);
-            this.setTopInnerStyle(h);
-            this.setTopMiddleStyle(b);
-            b.addEventListener("click", c[f].action);
-        }
-        this.setTopContainerStyle(g);
-        break;
-    case "drop":
-        for (f = 0; f < c.length; f++) {
-            h = document.createElement("div");
-            h.appendChild(document.createTextNode(c[f].name));
-            if (c[f].id) {
-              h.setAttribute("id", c[f].id);
-            };
-            g.appendChild(h);
-            this.setDropInnerStyle(h);
-            h.addEventListener("click", c[f].action);
-        }
-        this.setDropContainerStyle(g)
-    }
-    g.index = 1;
-    a.controls[e].push(g);
-    return g
-}
-MapControl.prototype.setTopInnerStyle = function (a) {
-    a.style.border = "1px solid";
-    a.style.borderColor = "white rgb(176, 176, 176) rgb(176, 176, 176) white";
-    a.style.font = "12px Arial";
-    a.style.width = "63px"
-};
-MapControl.prototype.setTopMiddleStyle = function (a) {
-    a.style.border = "1px solid black";
-    a.style.cursor = "pointer";
-    a.style.textAlign = "center";
-    a.style.display = "inline-block"
-};
-MapControl.prototype.setTopContainerStyle = function (a) {
-    a.style.backgroundColor = "white";
-    a.style.color = "black";
-    a.style.height = "18px";
-    a.style.marginRight = "5px";
-    a.style.marginTop = "5px";
-    a.style.lineHeight = "15px";
-    a.className = "dont_pri"
-};
-MapControl.prototype.setDropContainerStyle = function (a) {
-    a.style.color = "black";
-    a.style.backgroundColor = "white";
-    a.style.border = "1px solid black";
-    a.className = "dont_pri"
-};
-MapControl.prototype.setDropInnerStyle = function (a) {
-    a.style.font = "12px Arial";
-    a.style.width = "59px";
-    a.style.cursor = "pointer";
-    a.style.paddingLeft = "6px"
-};
-
-function ModeButtonCreator() {
-    var a = [];
-    a.push(new button("Start Over", function () {
-        clearMarkers();
-        location.hash=""; //clear
-    }));
-    return a
 }
 
 function getCurrentState() {
