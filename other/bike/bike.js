@@ -7,7 +7,29 @@
 var map;
 var directionsService = new google.maps.DirectionsService;
 var elevationService = new google.maps.ElevationService;
-var geocoderService = new google.maps.Geocoder;
+var geocoderService = {
+    geocoder : new google.maps.Geocoder(),
+    queue : [],
+    DELAY: 2000,
+    timer: null,
+    geocode: function(request, callback) {
+        this.queue.push([request, callback]);
+        if (this.timer == null) {
+            this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
+        }
+    },
+    processQueue: function() {
+        if (this.queue.length > 0) {
+            var data = this.queue.splice(0, 1)[0];
+            var request = data[0];
+            var callback = data[1];
+            this.geocoder.geocode(request, callback);
+        } else {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    },
+};
 
 google.load("visualization", "1", {
     packages: ["corechart"]
@@ -171,6 +193,7 @@ function directionsLoaded(marker_index, result) {
         map: map
     };
 
+    sections[marker_index].polyline.setMap(null);
     sections[marker_index].polyline = new google.maps.Polyline(a);
     sections[marker_index].route = result;
 
@@ -262,6 +285,10 @@ function addMarker(position, index) {
     };
     if (index != sections.length) {
         sections.splice(index, 0, section);
+        // invalidated sections
+        sections[index+1].polyline.setMap(null);
+        sections[index+1].polyline = new google.maps.Polyline();
+        sections[index+1].route = null;
     } else {
         sections.push(section);
     }
@@ -292,7 +319,7 @@ function geocode(index) {
         if (status == "OK") {
             sections[index].geocode = results[0].formatted_address;
         } else {
-            sections[index].geocode = "unknown";
+            sections[index].geocode = "unknown(" + status + ")";
         }
         refreshDirections();
       });
@@ -327,7 +354,7 @@ function findDirections(x) {
 
     var start_point = sections[x].marker.getPosition();
     var end_point = sections[y].marker.getPosition();
-
+    var travel_mode = sections[x].travelMode;
     var straight_result = {
         steps: [{
             lat_lngs: [start_point, end_point],
@@ -336,9 +363,17 @@ function findDirections(x) {
             value: start_point.distanceTo(end_point),
         },
     };
+    
+    var a = {
+        map: map,
+        path: [start_point, end_point],
+    };
+    sections[x].polyline.setMap(null);
+    // pre-set straight line
+    sections[x].polyline = new google.maps.Polyline(a);
 
-    if (sections[x].travelMode == "STRAIGHT") {
-        directionsLoaded(x, straight_result);
+    if (travel_mode == "STRAIGHT") {
+        // nothing to do
         return;
     }
 
@@ -355,7 +390,8 @@ function findDirections(x) {
         if (x >= sections.length ||
             y >= sections.length || 
             start_point != sections[x].marker.getPosition() ||
-            end_point != sections[y].marker.getPosition()) {
+            end_point != sections[y].marker.getPosition() ||
+            travel_mode != sections[x].travelMode) {
           // this is a stale callback, skip the results! 
           return;
         }
