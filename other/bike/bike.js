@@ -373,35 +373,34 @@ function findDirections(x) {
     sections[x].polyline = new google.maps.Polyline(a);
 
     if (travel_mode == "STRAIGHT") {
-        // nothing to do
-        return;
+        directionsLoaded(x, straight_result);
+    } else {
+        directionsService.route({
+            origin: start_point,
+            destination: end_point,
+            travelMode: sections[x].travelMode,
+            avoidHighways: true
+        }, function (directions_result, directions_status) {
+            utils.assert(directions_result.routes.length == 1);
+            utils.assert(directions_result.routes[0].legs.length == 1);
+            var result = directions_result.routes[0].legs[0];
+
+            if (x >= sections.length ||
+                y >= sections.length || 
+                start_point != sections[x].marker.getPosition() ||
+                end_point != sections[y].marker.getPosition() ||
+                travel_mode != sections[x].travelMode) {
+              // this is a stale callback, skip the results! 
+              return;
+            }
+            if (directions_status == "OK") {
+                directionsLoaded(x, result);
+            } else {
+                // fallback to straight line in case of an error
+                directionsLoaded(x, straight_result);
+            }
+        });
     }
-
-    directionsService.route({
-        origin: start_point,
-        destination: end_point,
-        travelMode: sections[x].travelMode,
-        avoidHighways: true
-    }, function (directions_result, directions_status) {
-        utils.assert(directions_result.routes.length == 1);
-        utils.assert(directions_result.routes[0].legs.length == 1);
-        var result = directions_result.routes[0].legs[0];
-
-        if (x >= sections.length ||
-            y >= sections.length || 
-            start_point != sections[x].marker.getPosition() ||
-            end_point != sections[y].marker.getPosition() ||
-            travel_mode != sections[x].travelMode) {
-          // this is a stale callback, skip the results! 
-          return;
-        }
-        if (directions_status == "OK") {
-            directionsLoaded(x, result);
-        } else {
-            // fallback to straight line in case of an error
-            directionsLoaded(x, straight_result);
-        }
-    });
     google.maps.event.trigger(map, "resize")
 }
 
@@ -420,30 +419,21 @@ function clearMarkers() {
 }
 
 function updateElevation() {
+    var MAX_POINTS = 100;
     var track = [];
     // note, we do not want last section!
-    for (var segment = 0; segment < sections.length - 1; segment++) {
+    for (var segment = 0; segment < sections.length; segment++) {
         var latLngs = sections[segment].polyline.getPath();
-        for (var x = 0; x < latLngs.length; x++) {
-            track.push(latLngs.getAt(x))
-        }
-    }
-
-    if (track.length > 350) {
-        var skip = track.length / 340;
-        var old = track;
-        track = [];
-        for (var x = 0; x <= old.length - 1; x += skip) {
-            // better to use floor than round (will not round to same value
-            // twice
-            track.push(old[Math.floor(x)])
+        var step = Math.max(1, latLngs.length / (MAX_POINTS / sections.length));
+        for (var x = 0; x < latLngs.length; x+=step) {
+            track.push(latLngs.getAt(Math.floor(x)))
         }
     }
 
     if (track.length > 0 && elevationService != null) {
         var query = {
             path: track,
-            samples: 500
+            samples: 250
         }
         elevationService.getElevationAlongPath(query, plotElevationCallback)
     } else {
