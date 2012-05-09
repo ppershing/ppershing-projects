@@ -8,13 +8,8 @@
           <input type="button" id="save_trip_button" value="save"/>
         </div>
 
-        <div style="width:200px; float:right; border=solid 1px;">
-            <div>
-              Trip:
-              <input type="button" value="clear" id="clear_button"/>
-              <ul id="directions_panel"> </ul>
-            </div>
-        </div>
+        <table>
+        <tr><td>
         <div style="width: 710px">
             <div id="map_canvas" style="width: 700px; height: 400px"></div>
             <div>
@@ -22,19 +17,37 @@
                 <span id="total_ascent"></span>
                 <span id="estimated_time"></span>
             </div>
-            <div id="elevation_chart"></div>
-            <div id="slope_chart"></div>
+            <div id="elevation_chart" style="width:700px"></div>
+            <div id="slope_chart" style=width:700px"></div>
         </div>
         <div>
             Saved trips:
             <div id="saved_trips_list"></div>
         </div>
+        <div>
+            Pre-defined trips:
+            <div id="server_trips_list"></div>
+        </div>
+        </td>
+        <td valign="top">
+        <div style="width:200px;">
+            <div>
+              Trip:
+              <input type="button" value="clear" id="clear_button"/>
+              <ul id="directions_panel"> </ul>
+            </div>
+        </div>
+
+        </td>
+        </tr>
+        </table>
         <div style="display: none;">
             <script type="text/javascript" src="http://www.google.com/jsapi"></script>
             <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
             <script type="text/javascript" src="utils.js"></script>
             <script type="text/javascript" src="bike.js"></script>
             <script type="text/javascript" src="saved_trips.js"></script>
+            <script type="text/javascript" src="server_trips.js"></script>
         </div>
     </body>
 </html>
