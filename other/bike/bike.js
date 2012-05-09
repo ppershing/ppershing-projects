@@ -1,12 +1,37 @@
 // vim: set sts=4: ts=4: sw=4: et
 /*
+ (c) PPershing
  (c) original file from: http://www.ridefreebikemaps.com/
- (c) PPershing (heavy edits)
  */
 
 var map;
 var directionsService = new google.maps.DirectionsService;
-var elevationService = new google.maps.ElevationService;
+var elevationService = {
+    elevation : new google.maps.ElevationService(),
+    queue : [],
+    DELAY: 100,
+    timer: null,
+    getElevationAlongPath : function(request, callback) {
+        this.queue.push([request, callback]);
+        if (this.timer == null) {
+            this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
+        }
+    },
+    processQueue: function() {
+        if (this.queue.length > 0) {
+            // we need only last element of the queue
+            var data = this.queue[this.queue.length - 1];
+            this.queue = [] 
+            var request = data[0];
+            var callback = data[1];
+            this.elevation.getElevationAlongPath(request, callback);
+        } else {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    },
+};
+
 var geocoderService = {
     geocoder : new google.maps.Geocoder(),
     queue : [],
@@ -31,9 +56,6 @@ var geocoderService = {
     },
 };
 
-google.load("visualization", "1", {
-    packages: ["corechart"]
-});
 
 var mousemarker = null;
 var elevationChart = null;
@@ -71,6 +93,7 @@ var ELEMENTS = {
     directionsPanel: document.getElementById("directions_panel"),
     autoNameCheckbox: document.getElementById("auto_name_checkbox"),
     clearButton: document.getElementById("clear_button"),
+    serverTripsList: document.getElementById("server_trips_list"),
 }
 
 function refreshDirections() {
@@ -121,21 +144,11 @@ function initializeUI() {
     google.visualization.events.addListener(elevationChart, 'onmouseover', elevationMouseOver);
     google.visualization.events.addListener(elevationChart, 'onmouseout', elevationMouseOut);
     google.visualization.events.addListener(elevationChart, 'select', elevationClick);
-    plotElevation([]);
 
     slopeChart = new google.visualization.ColumnChart(ELEMENTS.slopeChart);
     google.visualization.events.addListener(slopeChart, 'onmouseover', slopeMouseOver);
     google.visualization.events.addListener(slopeChart, 'onmouseout', slopeMouseOut);
-    plotSlope([]);
 
-}
-
-// FIXME: what is the effect of this formula on latlongs?
-function findDistance(latLng1, latLng2) {
-    return Math.sqrt(
-        Math.pow(latLng1.lat() - latLng2.lat(), 2) + 
-        Math.pow(latLng1.lng() - latLng2.lng(), 2)
-    );
 }
 
 function elevationMouseOver(e) {
@@ -296,7 +309,9 @@ function addMarker(position, index) {
     if (index > 0) {
         findDirections(index - 1);
     }
-    findDirections(index);
+    if (index < sections.length - 1) {
+        findDirections(index);
+    }
 
     refreshPermalink();
 
@@ -313,7 +328,7 @@ function geocode(index) {
       function(results, status) {
         if (index >= sections.length ||
             sections[index].marker.getPosition() != point) {
-            // stale response, ignore
+            console.log('geocode: stale callback!');
             return;
         }
         if (status == "OK") {
@@ -349,6 +364,7 @@ function findDirections(x) {
     }
     if (sections.length == y) {
         // nothing to do (dummy segment at the end)
+        console.log('findDirections: skipped last segment');
         return;
     }
 
@@ -374,34 +390,36 @@ function findDirections(x) {
 
     if (travel_mode == "STRAIGHT") {
         directionsLoaded(x, straight_result);
-    } else {
-        directionsService.route({
-            origin: start_point,
-            destination: end_point,
-            travelMode: sections[x].travelMode,
-            avoidHighways: true
-        }, function (directions_result, directions_status) {
-            utils.assert(directions_result.routes.length == 1);
-            utils.assert(directions_result.routes[0].legs.length == 1);
-            var result = directions_result.routes[0].legs[0];
+        return;
+    };
 
-            if (x >= sections.length ||
-                y >= sections.length || 
-                start_point != sections[x].marker.getPosition() ||
-                end_point != sections[y].marker.getPosition() ||
-                travel_mode != sections[x].travelMode) {
-              // this is a stale callback, skip the results! 
-              return;
-            }
-            if (directions_status == "OK") {
-                directionsLoaded(x, result);
-            } else {
-                // fallback to straight line in case of an error
-                directionsLoaded(x, straight_result);
-            }
-        });
-    }
-    google.maps.event.trigger(map, "resize")
+    var query = {
+        origin: start_point,
+        destination: end_point,
+        travelMode: travel_mode,
+        avoidHighways: true
+    };
+
+    directionsService.route(query, function (directions_result, directions_status) {
+        utils.assert(directions_result.routes.length == 1);
+        utils.assert(directions_result.routes[0].legs.length == 1);
+        var result = directions_result.routes[0].legs[0];
+
+        if (x >= sections.length ||
+            y >= sections.length || 
+            start_point != sections[x].marker.getPosition() ||
+            end_point != sections[y].marker.getPosition() ||
+            travel_mode != sections[x].travelMode) {
+          console.log('findDirections: stale callback!');
+          return;
+        }
+        if (directions_status == "OK") {
+            directionsLoaded(x, result);
+        } else {
+            // fallback to a straight line in case of an error
+            directionsLoaded(x, straight_result);
+        }
+    });
 }
 
 function clearMarkers() {
@@ -411,36 +429,63 @@ function clearMarkers() {
     }
     sections = [];
     // Due to some unknown reason it might be null even after initialization
-    elevationChart.clearChart();
-    slopeChart.clearChart();
+    plotElevation([]);
+    plotSlope([]);
     refreshPermalink();
     refreshDirections();
     ELEMENTS.saveTripTextName.value = "";
 }
 
-function updateElevation() {
-    var MAX_POINTS = 100;
-    var track = [];
-    // note, we do not want last section!
-    for (var segment = 0; segment < sections.length; segment++) {
+function getTrackPoints(max_points) {
+    var track = []
+    for (var segment = 0; segment < sections.length-1; segment++) {
         var latLngs = sections[segment].polyline.getPath();
-        var step = Math.max(1, latLngs.length / (MAX_POINTS / sections.length));
+        var step = Math.max(1, latLngs.length / (max_points / sections.length));
         for (var x = 0; x < latLngs.length; x+=step) {
             track.push(latLngs.getAt(Math.floor(x)))
         }
     }
+    return track;
+}
 
-    if (track.length > 0 && elevationService != null) {
-        var query = {
-            path: track,
-            samples: 250
-        }
-        elevationService.getElevationAlongPath(query, plotElevationCallback)
-    } else {
+function updateElevation() {
+    var MAX_POINTS = 100;
+    var track = getTrackPoints(MAX_POINTS);
+    // TODO: this is nasty!
+    var fingerprint = JSON.stringify(track);
+    // note, we do not want last section!
+    if (track.length == 0) {
         ELEMENTS.totalAscent.textContent = "total ascent: N/A"
-        elevationChart.clearChart()
-        slopeChart.clearChart()
+        plotElevation([]);
+        plotSlope([]);
+        return;
     }
+
+
+    var query = {
+        path: track,
+        samples: 250
+    }
+
+    elevationService.getElevationAlongPath(query, function(a, status) {
+        var track2 = getTrackPoints(MAX_POINTS);
+        var fingerprint2 = JSON.stringify(track2)
+        if (fingerprint != fingerprint2) {
+            console.log('updateElevation: stale callback!');
+            return;
+        }
+        if (status == google.maps.ElevationStatus.OK) {
+            // FIXME: this needs to be global due to the stupid graph!
+            elevations = a;
+            plotElevation(elevations)
+            plotSlope(elevations)
+            updateAscentInfo(elevations)
+        } else {
+            plotElevation([]);
+            plotSlope([]);
+            ELEMENTS.totalAscent.textContent = "error retrieving elevation info!";
+        }
+    });
 }
 
 function totalDistance() {
@@ -462,7 +507,7 @@ function plotElevation(elevations) {
         }
 
         elevationChart.draw(c, {
-            width: 800,
+            width: 700,
             height: 250,
             series: [{visibleInLegend: false}],
         })
@@ -486,7 +531,7 @@ function plotSlope(elevations) {
             c2.addRow([distance.toFixed(0), Math.round(slope * 100 * 10) / 10]);
         }
         slopeChart.draw(c2, {
-            width: 800,
+            width: 700,
             height: 250,
             series: [{visibleInLegend: false}],
         })
@@ -540,19 +585,6 @@ function updateAscentInfo(elevations) {
         "Estimated time: " + hours + "h " + mins + "m";
 }
 
-function plotElevationCallback(a, b) {
-    if (b == google.maps.ElevationStatus.OK) {
-        // FIXME: this needs to be global due to the stupid graph!
-        elevations = a;
-        plotElevation(elevations)
-        plotSlope(elevations)
-        updateAscentInfo(elevations)
-    } else {
-        elevationChart.clearChart();
-        slopeChart.clearChart();
-        ELEMENTS.totalAscent.textContent = "error retrieving elevation info!";
-    }
-}
 
 
 function button(a, b, c) {
@@ -633,8 +665,10 @@ function setCurrentState(state) {
     if (state.travelmodes) {
         utils.assert(state.travelmodes.length == state.markers.length);
         for (var x = 0; x < state.travelmodes.length; x++) {
-            sections[x].travelMode = state.travelmodes[x];
-            findDirections(x);
+            if (sections[x].travelMode != state.travelmodes[x]) {
+                sections[x].travelMode = state.travelmodes[x];
+                findDirections(x);
+            }
         }
     }
 
@@ -658,15 +692,31 @@ function loadFromHistory() {
     serialized = serialized.substring(1);
     serialized = serialized.replace(/\|/g, "\"");
     var state = JSON.parse(serialized);
-    setCurrentState(state);
+    if (state.load_from != undefined) {
+        // we have the link to the state
+        if (!state.load_from.match(/[a-zA-Z0-9._]+/)) {
+            throw "Security violation!"
+        }
+        var request = new XMLHttpRequest()
+        request.open("GET", state.load_from, true)
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200) {
+                    var state = JSON.parse(request.responseText);
+                    setCurrentState(state);
+                } else {
+                    alert('Could not load the trip!');
+                }
+            } else {
+                // pass
+            }
+        }
+        request.send(null);
+    } else {
+        // we have the state
+        setCurrentState(state);
+    }
 }
-
-function directionsCenter(a) {
-    var b = new google.maps.LatLngBounds;
-    for (bound = 0; bound < a.length; bound++) b.extend(a[bound]);
-    return b
-}
-
 
 function findNearestVertex(a) {
     var smDelta = 100;
@@ -683,7 +733,7 @@ function findNearestVertex(a) {
             for (var t = 0; t < 1; t+= step) {
               var p = new google.maps.LatLng(p1.lat() * t + p2.lat() * (1-t),
                                              p1.lng() * t + p2.lng() * (1-t));
-              var distance = findDistance(a, p);
+              var distance = a.distanceTo(p);
               if (distance < smDelta) {
                   smDelta = distance;
                   closest = [p, path];
@@ -695,28 +745,20 @@ function findNearestVertex(a) {
 }
 
 
-var initComplete = !1;
+var initComplete = 0;
 
 function init() {
-    if (!arguments.callee.done) {
-        arguments.callee.done = !0;
-        if (_timer) {
-          clearInterval(_timer);
-        };
-
-        initializeUI();
-        initComplete = 1
-        loadFromHistory();
-        saved_trips.refreshOnPage();
-        window.onhashchange = function () { loadFromHistory(); };
-    }
+    initializeUI();
+    initComplete = 1
+    loadFromHistory();
+    saved_trips.refreshOnPage();
+    window.onhashchange = function () { loadFromHistory(); };
 }
 
-document.addEventListener && document.addEventListener("DOMContentLoaded", init, !1);
-if (/WebKit/i.test(navigator.userAgent)) var _timer = setInterval(function () {
-    /loaded|complete/.test(document.readyState) && init()
-}, 10);
-window.onload = init;
+google.load("visualization", "1", {
+    packages: ["corechart"]
+});
+google.setOnLoadCallback(init);
 
 google.maps.LatLng.prototype.distanceTo = function(a){ 
   var e = Math, ra = e.PI/180; 
