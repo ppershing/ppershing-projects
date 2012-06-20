@@ -130,7 +130,16 @@ function refreshDirections() {
     }
 }
 
+
 function initializeUI() {
+    var resizeWindow = function() {
+            ELEMENTS.mapCanvas.style.height = Math.max(400,
+            document.body.clientHeight * 0.70);
+        }
+
+    window.onresize = resizeWindow;
+    resizeWindow();
+
     map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
     google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng, sections.length);});
     google.maps.event.addListener(map, "bounds_changed", function (event) {refreshPermalink()});
@@ -214,8 +223,6 @@ function directionsLoaded(marker_index, result) {
         var nearest = findNearestVertex(a.latLng);
         addMarker(nearest[0], nearest[1] + 1);
     });
-    var a = totalDistance();
-    ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a / 1000) + " km";
     updateElevation()
 }
 
@@ -238,12 +245,20 @@ function removeMarker(marker) {
     if (marker_index != 0) {
         if (marker_index == sections.length) {
             sections[marker_index - 1].polyline.setMap(null);
+            sections[marker_index - 1].route = {
+                steps: [],
+                distance: {
+                    value: 0,
+                },
+            };
         } else {
             findDirections(marker_index - 1);
         }
     };
     refreshDirections();
     refreshPermalink();
+    // need to call explicitely (no new directions => no update)
+    updateElevation();
 }
 
 function dragendMarker(marker) {
@@ -401,10 +416,6 @@ function findDirections(x) {
     };
 
     directionsService.route(query, function (directions_result, directions_status) {
-        utils.assert(directions_result.routes.length == 1);
-        utils.assert(directions_result.routes[0].legs.length == 1);
-        var result = directions_result.routes[0].legs[0];
-
         if (x >= sections.length ||
             y >= sections.length || 
             start_point != sections[x].marker.getPosition() ||
@@ -414,8 +425,12 @@ function findDirections(x) {
           return;
         }
         if (directions_status == "OK") {
+            utils.assert(directions_result.routes.length >= 1);
+            utils.assert(directions_result.routes[0].legs.length == 1);
+            var result = directions_result.routes[0].legs[0];
             directionsLoaded(x, result);
         } else {
+            console.log('findDirections: ' + directions_status);
             // fallback to a straight line in case of an error
             directionsLoaded(x, straight_result);
         }
@@ -458,6 +473,7 @@ function updateElevation() {
         ELEMENTS.totalAscent.textContent = "total ascent: N/A"
         plotElevation([]);
         plotSlope([]);
+        updateInfo([]);
         return;
     }
 
@@ -479,7 +495,7 @@ function updateElevation() {
             elevations = a;
             plotElevation(elevations)
             plotSlope(elevations)
-            updateAscentInfo(elevations)
+            updateInfo(elevations)
         } else {
             plotElevation([]);
             plotSlope([]);
@@ -575,7 +591,9 @@ function getEstimatedTime(dist_in_m, ascent_in_m) {
     return flat_time + ascent_time;
 }
 
-function updateAscentInfo(elevations) {
+function updateInfo(elevations) {
+    var a = totalDistance();
+    ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a / 1000) + " km";
     ELEMENTS.totalAscent.textContent = "Ascent: " +
         Math.round(getAscent(elevations)) + " m";
     var time = getEstimatedTime(totalDistance(), getAscent(elevations))

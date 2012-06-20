@@ -1,5 +1,5 @@
 var server_trips = {
-    TRIP_FILE : "trips",
+    TRIP_FILE : "trips/trips",
     rootElement: ELEMENTS.serverTripsList,
 
     init: function() {
