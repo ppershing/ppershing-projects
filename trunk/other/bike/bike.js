@@ -311,14 +311,13 @@ function addMarker(position, index) {
         geocode: null,
         route: null,
     };
-    if (index != sections.length) {
-        sections.splice(index, 0, section);
+
+    sections.splice(index, 0, section);
+    if (index != 0) {
         // invalidated sections
-        sections[index+1].polyline.setMap(null);
-        sections[index+1].polyline = new google.maps.Polyline();
-        sections[index+1].route = null;
-    } else {
-        sections.push(section);
+        sections[index - 1].polyline.setMap(null);
+        sections[index - 1].polyline = new google.maps.Polyline();
+        sections[index - 1].route = null;
     }
 
     if (index > 0) {
@@ -330,7 +329,7 @@ function addMarker(position, index) {
 
     refreshPermalink();
 
-    geocode(sections.length - 1);
+    geocode(index);
 }
 
 function geocode(index) {
