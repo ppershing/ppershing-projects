@@ -5,7 +5,141 @@
  */
 
 var map;
-var directionsService = new google.maps.DirectionsService;
+
+var OpenstreetmapRouteDirectionsService = function() {
+    this.transport_url = "transport.php?url=";
+    this.base_url = "http://www.yournavigation.org/api/1.0/gosmore.php"
+
+    this.route = function(query, callback) {
+        var request = new XMLHttpRequest();
+        url = this.transport_url;
+        url += this.base_url;
+        url += "&flat=" + query.origin.lat();
+        url += "&flon=" + query.origin.lng();
+        url += "&tlat=" + query.destination.lat();
+        url += "&tlon=" + query.destination.lng();
+        url += "&v=" + query.travelMode;
+        url += "&format=geojson";
+
+        request.open("GET", url, true);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200) {
+                    response = JSON.parse(request.responseText);
+                    var lat_lngs = []
+                    for (var i = 0; i < response.coordinates.length; i++) {
+                        lat_lngs.push(new
+                        google.maps.LatLng(response.coordinates[i][1],
+                        response.coordinates[i][0]));
+                    };
+
+                    result = {
+                        steps: [{ lat_lngs: lat_lngs}],
+                        distance: {
+                            value: response.properties.distance * 1000,
+                        }
+                    };
+                    callback(result, "OK");
+                } else {
+                    callback(null, "Request failed");
+                }
+            } else {
+                // pass
+            }
+        };
+        request.send(null);
+    }
+};
+
+var googleRouteService = {
+    service : new google.maps.DirectionsService(),
+
+    route : function(query, callback) {
+        this.service.route(query,
+            function (directions_result, directions_status) {
+                if (directions_status == "OK") {
+                    utils.assert(directions_result.routes.length >= 1);
+                    utils.assert(directions_result.routes[0].legs.length == 1);
+                    var result = directions_result.routes[0].legs[0];
+                    callback(result, directions_status)
+                } else {
+                    callback(null, directions_status);
+                }
+            });
+    }
+}
+
+var openRouteService = new OpenstreetmapRouteDirectionsService();
+var straightRouteService = {
+    route: function(query, callback) {
+        callback(this.getResult(query), "OK");
+    },
+
+    getResult: function(query) {
+        var result = {
+            steps: [{
+                lat_lngs: [query.origin, query.destination],
+            }],
+            distance: {
+                value: query.origin.distanceTo(query.destination),
+            },
+        };
+        return result;
+    },
+}
+
+var directionsService = {
+    travelmodes : {
+        STRAIGHT : {
+            text: "Straight link",
+            type: null,
+            engine : straightRouteService
+        },
+        WALKING : {
+            text: "Walk (Gmaps)",
+            type: google.maps.DirectionsTravelMode.WALKING,
+            engine: googleRouteService
+        },
+        DRIVING : {
+            text: "Car (Gmaps)",
+            type: google.maps.DirectionsTravelMode.DRIVING,
+            engine: googleRouteService
+        },
+        OSM_WALK: {
+            text : "Pedestian (OSM)",
+            type : "foot",
+            engine: openRouteService
+        },
+    },
+
+    queue : [],
+    DELAY: 1000,
+    timer: null,
+
+    route : function(query, callback) {
+        utils.assert(this.travelmodes[query.travelMode] != undefined, "Wrong travelmode" + query.travelMode);
+        this.queue.push([query, callback]);
+        if (this.timer == null) {
+            this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
+        }
+    },
+    processQueue: function() {
+        if (this.queue.length > 0) {
+            var data = this.queue.splice(0, 1)[0];
+            var query = data[0];
+            var callback = data[1];
+
+            var service = this.travelmodes[query.travelMode].engine;
+            query.travelMode = this.travelmodes[query.travelMode].type;
+            service.route(query, callback);
+        } else {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    },
+
+};
+
 var elevationService = {
     elevation : new google.maps.ElevationService(),
     queue : [],
@@ -76,7 +210,7 @@ var CONFIG = {
         SPEED_KM_FLAT: 22 /*km/h*/,
         ASCENT_METRES_MIN: 15 /*m/min*/,
     },
-    DEFAULT_TRAVEL_MODE: google.maps.DirectionsTravelMode.DRIVING,
+    DEFAULT_TRAVEL_MODE: "OSM_WALK",
 };
 
 var ELEMENTS = {
@@ -199,7 +333,7 @@ function slopeMouseOut(e) {
     elevationChart.setSelection([])
 }
 
-function directionsLoaded(marker_index, result) {
+function directionsLoaded(marker_index, result, loaded_ok) {
     var latlngs = [];
 
     for (var x = 0; x < result.steps.length; x++) {
@@ -210,7 +344,7 @@ function directionsLoaded(marker_index, result) {
 
     var a = {
         path: latlngs,
-        strokeColor: "#0000CC",
+        strokeColor: loaded_ok ? "#0000CC" : "#CC0000",
         strokeOpacity: 0.4,
         map: map
     };
@@ -356,15 +490,12 @@ function geocode(index) {
 
 function createTravelModeSelect(selected_mode) {
   var select = document.createElement("select");
-  options = [ ["STRAIGHT", "Straight link"],
-              [google.maps.DirectionsTravelMode.WALKING, "Walk"],
-              [google.maps.DirectionsTravelMode.DRIVING, "Car"],
-            ]
-  for (var i=0; i<options.length; i++) {
+  var modes = directionsService.travelmodes;
+  for (key in modes) {
     var option = document.createElement("option");
-    option.selected = (selected_mode == options[i][0]);
-    option.value = options[i][0];
-    option.textContent=options[i][1];
+    option.selected = (selected_mode == key);
+    option.value = key;
+    option.textContent=modes[key]['text'];
     select.appendChild(option);
   }
   return select;
@@ -385,14 +516,6 @@ function findDirections(x) {
     var start_point = sections[x].marker.getPosition();
     var end_point = sections[y].marker.getPosition();
     var travel_mode = sections[x].travelMode;
-    var straight_result = {
-        steps: [{
-            lat_lngs: [start_point, end_point],
-        }],
-        distance: {
-            value: start_point.distanceTo(end_point),
-        },
-    };
     
     var a = {
         map: map,
@@ -402,17 +525,13 @@ function findDirections(x) {
     // pre-set straight line
     sections[x].polyline = new google.maps.Polyline(a);
 
-    if (travel_mode == "STRAIGHT") {
-        directionsLoaded(x, straight_result);
-        return;
-    };
-
     var query = {
         origin: start_point,
         destination: end_point,
         travelMode: travel_mode,
         avoidHighways: true
     };
+    var straight_result = straightRouteService.getResult(query);
 
     directionsService.route(query, function (directions_result, directions_status) {
         if (x >= sections.length ||
@@ -424,14 +543,11 @@ function findDirections(x) {
           return;
         }
         if (directions_status == "OK") {
-            utils.assert(directions_result.routes.length >= 1);
-            utils.assert(directions_result.routes[0].legs.length == 1);
-            var result = directions_result.routes[0].legs[0];
-            directionsLoaded(x, result);
+            directionsLoaded(x, directions_result, true);
         } else {
             console.log('findDirections: ' + directions_status);
             // fallback to a straight line in case of an error
-            directionsLoaded(x, straight_result);
+            directionsLoaded(x, straight_result, false);
         }
     });
 }
