@@ -264,6 +264,41 @@ function refreshDirections() {
     }
 }
 
+function initializeMap() {
+    var mapTypeIds = [];
+    mapTypeIds.push("OSM");
+    mapTypeIds.push("OCM");
+    for(var type in google.maps.MapTypeId) {
+        mapTypeIds.push(google.maps.MapTypeId[type]);
+    }
+
+    map = new google.maps.Map(ELEMENTS.mapCanvas, {
+        center: CONFIG.MAP_SETTINGS.center,
+        zoom: CONFIG.MAP_SETTINGS.zoom,
+        mapTypeId: CONFIG.MAP_SETTINGS.mapTypeId,
+        mapTypeControlOptions: {
+            mapTypeIds: mapTypeIds
+        }
+    });
+
+    map.mapTypes.set("OSM", new google.maps.ImageMapType({
+        getTileUrl: function(coord, zoom) {
+            return "http://tile.openstreetmap.org/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
+        },
+        tileSize: new google.maps.Size(256, 256),
+        name: "OpenStreetMap",
+        maxZoom: 18
+    }));
+
+    map.mapTypes.set("OCM", new google.maps.ImageMapType({
+        getTileUrl: function(coord, zoom) {
+            return "http://tile.opencyclemap.org/cycle/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
+        },
+        tileSize: new google.maps.Size(256, 256),
+        name: "OpenCycleMap",
+        maxZoom: 18
+    }));
+}
 
 function initializeUI() {
     var resizeWindow = function() {
@@ -274,7 +309,7 @@ function initializeUI() {
     window.onresize = resizeWindow;
     resizeWindow();
 
-    map = new google.maps.Map(ELEMENTS.mapCanvas, CONFIG.MAP_SETTINGS);
+    initializeMap();
     google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng, sections.length);});
     google.maps.event.addListener(map, "bounds_changed", function (event) {refreshPermalink()});
 
