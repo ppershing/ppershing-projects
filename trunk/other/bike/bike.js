@@ -12,7 +12,7 @@ var OpenstreetmapRouteDirectionsService = function() {
 
     this.route = function(query, callback) {
         var request = new XMLHttpRequest();
-        url = this.transport_url;
+        var url = this.transport_url;
         url += this.base_url;
         url += "&flat=" + query.origin.lat();
         url += "&flon=" + query.origin.lng();
@@ -190,6 +190,60 @@ var geocoderService = {
     },
 };
 
+var rawSavedTracksService = {
+    base_url : "tracks.php",
+
+    getVisibleTracks: function(bounds, callback) {
+
+        var request = new XMLHttpRequest();
+        var url = this.base_url;
+        url += "?left=" + bounds.getSouthWest().lng();
+        url += "&top=" + bounds.getNorthEast().lat();
+        url += "&right=" + bounds.getNorthEast().lng();
+        url += "&bottom=" + bounds.getSouthWest().lat();
+        request.open("GET", url, true);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200) {
+                    var response = JSON.parse(request.responseText);
+                    callback(response);
+                } else {
+                    console.log("Requesting tracks failed!");
+                    callback({});
+                }
+            } else {
+                // pass
+            }
+        };
+        request.send(null);
+    }
+}
+
+var savedTracksService = {
+    service : rawSavedTracksService,
+    queue : [],
+    DELAY: 500,
+    timer: null,
+    getVisibleTracks: function(request, callback) {
+        this.queue.push([request, callback]);
+        if (this.timer == null) {
+            this.processQueue();
+        }
+        this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
+    },
+    processQueue: function() {
+        if (this.queue.length > 0) {
+            var data = this.queue[this.queue.length - 1];
+            this.queue = [] 
+            var request = data[0];
+            var callback = data[1];
+            this.service.getVisibleTracks(request, callback);
+        } else {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    },
+};
 
 var mousemarker = null;
 var elevationChart = null;
@@ -199,7 +253,7 @@ var sections = [];
 
 var elevations = [];
 var slopeToElevationIndex = [];
-
+var saved_tracks = {}; // we need associative array!
 var CONFIG = {
     MAP_SETTINGS : {
         zoom: 8,
@@ -310,8 +364,13 @@ function initializeUI() {
     resizeWindow();
 
     initializeMap();
-    google.maps.event.addListener(map, "click", function (event) {addMarker(event.latLng, sections.length);});
-    google.maps.event.addListener(map, "bounds_changed", function (event) {refreshPermalink()});
+    google.maps.event.addListener(map, "click", function (event) {
+            addMarker(event.latLng, sections.length);
+        });
+    google.maps.event.addListener(map, "bounds_changed", function (event) {
+            refreshPermalink();
+            refreshTracks();
+        });
 
     ELEMENTS.clearButton.addEventListener("click", clearMarkers);
     ELEMENTS.saveTripButton.addEventListener("click", 
@@ -327,6 +386,91 @@ function initializeUI() {
     google.visualization.events.addListener(slopeChart, 'onmouseover', slopeMouseOver);
     google.visualization.events.addListener(slopeChart, 'onmouseout', slopeMouseOut);
 
+}
+
+function refreshTracks() {
+    savedTracksService.getVisibleTracks(map.getBounds(),
+        function (response) {
+            for (key in saved_tracks) {
+                var trk = saved_tracks[key];
+                for (var i = 0; i < trk.polylines.length; i++) {
+                    trk.polylines[i].setMap(null);
+                }
+                trk.polylines = [];
+            }
+
+            for (key in response) {
+                var rsp = response[key];
+                if (saved_tracks[key] == undefined) {
+                    saved_tracks[key] = {
+                        polylines: [],
+                        infoWindow: new InfoBubble(
+                            { content: rsp.type + " " + rsp.date + 
+                                " : " + rsp.name,
+                              disableAutoPan: true,
+                              hideCloseButton: true,
+                              disableAnimation: true,
+                            }),
+                        };
+                }
+
+                for (var i = 0; i < rsp.seg.length; i++) {
+                    var seg = rsp.seg[i];
+
+                    var latlngs = []
+                    for (var j = 0; j < seg.length; j++) {
+                        var lat = seg[j].lat;
+                        var lng = seg[j].lng;
+                        latlngs.push(new google.maps.LatLng(lat, lng));
+                    }
+
+                    var saved_track_colors = {
+                        "bike" : "#66CCFF",
+                        "beh" : "#FF3333",
+                        "vylet" : "#99FF33",
+                        "prechadzka" : "#66FF99",
+                        "unknown" : "#8F00FF"
+                    }
+
+                    var a = {
+                        path: latlngs,
+                        strokeColor: saved_track_colors[rsp.type] !=
+                        undefined ? saved_track_colors[rsp.type] : 
+                        saved_track_colors["unknown"],
+                        strokeOpacity: 0.7,
+                        strokeWeight: 4,
+                        map: map
+                    };
+
+
+                    var polyline = new google.maps.Polyline(a);
+                    (function (infoWindow, polylines) {
+                        google.maps.event.addListener(polyline,
+                            'mouseover', function(event) {
+                                infoWindow.setPosition(event.latLng);
+                                infoWindow.open(map);
+                                for (var i = 0; i < polylines.length; i++)
+                                {
+                                    polylines[i].set('strokeOpacity', 1);
+                                    polylines[i].set('strokeWeight', 7);
+                                }
+                            });
+                        google.maps.event.addListener(polyline,
+                            'mouseout', function () {
+                                infoWindow.close();
+                                for (var i = 0; i < polylines.length; i++)
+                                {
+                                    polylines[i].set('strokeOpacity', 0.7);
+                                    polylines[i].set('strokeWeight', 4);
+                                }
+                            });
+                    }) (saved_tracks[key].infoWindow,
+                    saved_tracks[key].polylines);
+
+                    saved_tracks[key].polylines.push(polyline);
+                }
+            }
+        });
 }
 
 function elevationMouseOver(e) {
