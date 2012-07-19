@@ -15,6 +15,7 @@ var sections = [];
 
 var elevations = [];
 var slopeToElevationIndex = [];
+
 var saved_tracks = {}; // we need associative array!
 var CONFIG = {
     MAP_SETTINGS : {
@@ -22,12 +23,26 @@ var CONFIG = {
         center: new google.maps.LatLng(46.6, 7.7),
         mapTypeId: google.maps.MapTypeId.HYBRID
     },
-    SPEED_SETTINGS : {
-        SPEED_KM_FLAT: 22 /*km/h*/,
-        ASCENT_METRES_MIN: 15 /*m/min*/,
+    ETA_MODES : {
+        BIKING : {
+            SPEED_KM_FLAT: 20 /*km/h*/,
+            ASCENT_METRES_MIN: 8 /*m/min*/,
+        },
+        HIKING : {
+            SPEED_KM_FLAT: 3.5,
+            ASCENT_METRES_MIN: 8,
+        },
+        RUNNING : {
+            SPEED_KM_FLAT: 9,
+            ASCENT_METRES_MIN: 8,
+        }
     },
+    DEFAULT_ETA_MODE: "BIKING",
     DEFAULT_TRAVEL_MODE: "OSM_WALK",
 };
+
+var eta_mode = CONFIG.DEFAULT_ETA_MODE;
+var default_travel_mode = CONFIG.DEFAULT_TRAVEL_MODE;
 
 var ELEMENTS = {
     mapCanvas: document.getElementById("map_canvas"),
@@ -44,6 +59,12 @@ var ELEMENTS = {
     autoNameCheckbox: document.getElementById("auto_name_checkbox"),
     clearButton: document.getElementById("clear_button"),
     serverTripsList: document.getElementById("server_trips_list"),
+    defaultTravelMode: document.getElementById("default_travel_mode"),
+    EtaModes : {
+        "BIKING" : document.getElementById("ETA_mode_BIKING"),
+        "HIKING" : document.getElementById("ETA_mode_HIKING"),
+        "RUNNING" : document.getElementById("ETA_mode_RUNNING"),
+    }
 }
 
 function refreshDirections() {
@@ -139,6 +160,20 @@ function initializeUI() {
         function() {saved_trips.add({name: ELEMENTS.saveTripTextName.value, data:getCurrentState()});}
       );
 
+    for (var key in ELEMENTS.EtaModes) {
+        (function (mode) {
+            ELEMENTS.EtaModes[mode].addEventListener("click",
+                function() {
+                    for (tmp in ELEMENTS.EtaModes) {
+                        ELEMENTS.EtaModes[tmp].classList.remove('eta_mode_img_selected');
+                    };
+                    ELEMENTS.EtaModes[mode].classList.add('eta_mode_img_selected');
+                    eta_mode = mode;
+                    updateInfo(elevations);
+                });
+        }(key));
+    }
+
     elevationChart = new google.visualization.AreaChart(ELEMENTS.elevationChart);
     google.visualization.events.addListener(elevationChart, 'onmouseover', elevationMouseOver);
     google.visualization.events.addListener(elevationChart, 'onmouseout', elevationMouseOut);
@@ -148,6 +183,13 @@ function initializeUI() {
     google.visualization.events.addListener(slopeChart, 'onmouseover', slopeMouseOver);
     google.visualization.events.addListener(slopeChart, 'onmouseout', slopeMouseOut);
 
+    updateInfo([]);
+    
+    var select = createTravelModeSelect(CONFIG.DEFAULT_TRAVEL_MODE);
+    select.onchange = function() {
+            default_travel_mode = select.value;
+        };
+    ELEMENTS.defaultTravelMode.appendChild(select);
 }
 
 function refreshTracks() {
@@ -381,8 +423,7 @@ function addMarker(position, index) {
         marker: marker,
         polyline: new google.maps.Polyline(),
         travelMode: (index > 0) ? 
-                sections[index - 1].travelMode :
-                CONFIG.DEFAULT_TRAVEL_MODE,
+                sections[index - 1].travelMode : default_travel_mode,
         geocode: null,
         route: null,
     };
@@ -404,6 +445,7 @@ function addMarker(position, index) {
 
     refreshPermalink();
 
+    refreshDirections();
     geocode(index);
 }
 
@@ -642,21 +684,20 @@ function getAscent(elevations) {
  * @returns estimated time in hours
  */
 function getEstimatedTime(dist_in_m, ascent_in_m) {
-    var flat_time = dist_in_m / 1000 / CONFIG.SPEED_SETTINGS.SPEED_KM_FLAT;
-    var ascent_time = ascent_in_m / CONFIG.SPEED_SETTINGS.ASCENT_METRES_MIN / 60;
+    var speeds = CONFIG.ETA_MODES[eta_mode];
+    var flat_time = dist_in_m / 1000 / speeds.SPEED_KM_FLAT;
+    var ascent_time = ascent_in_m / speeds.ASCENT_METRES_MIN / 60;
     return flat_time + ascent_time;
 }
 
 function updateInfo(elevations) {
     var a = totalDistance();
-    ELEMENTS.totalDistance.textContent = "Distance: " + Math.round(a / 1000) + " km";
-    ELEMENTS.totalAscent.textContent = "Ascent: " +
-        Math.round(getAscent(elevations)) + " m";
+    ELEMENTS.totalDistance.textContent = Math.round(a / 1000) + " km";
+    ELEMENTS.totalAscent.textContent = Math.round(getAscent(elevations)) + " m";
     var time = getEstimatedTime(totalDistance(), getAscent(elevations))
     var hours = Math.floor(time);
     var mins = Math.round(60 * (time - hours));
-    ELEMENTS.estimatedTime.textContent =
-        "Estimated time: " + hours + "h " + mins + "m";
+    ELEMENTS.estimatedTime.textContent = hours + "h " + mins + "m";
 }
 
 
@@ -763,6 +804,8 @@ function loadFromHistory() {
         return;
     }
     var serialized = location.hash.toString();
+
+    serialized = decodeURI(serialized);
     serialized = serialized.substring(1);
     serialized = serialized.replace(/\|/g, "\"");
     var state = JSON.parse(serialized);
