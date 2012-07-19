@@ -102,6 +102,10 @@ Namespace('services.routing', {
             type : "foot",
             engine: this.openRouteService
         },
+        OSM_BIKE: {
+            type : "bicycle",
+            engine: this.openRouteService
+        },
     };
 
     this.queue = [];
@@ -148,6 +152,9 @@ directionsService.travelmodes = {
     OSM_WALK: {
         text : "Pedestian (OSM)",
     },
+    OSM_BIKE : {
+        text : "Bicycle (OSM)",
+    }
 };
 
 Namespace('services.elevation', {
@@ -180,30 +187,33 @@ Namespace('services.elevation', {
 
 var elevationService = new services.elevation.ElevationService();
 
+Namespace('services.geocoding', {
+    GeocoderService : function() {
+        this.geocoder = new google.maps.Geocoder();
+        this.queue = [];
+        this.DELAY = 2000;
+        this.timer = null;
+        this.geocode = function(request, callback) {
+            this.queue.push([request, callback]);
+            if (this.timer == null) {
+                this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
+            }
+        };
+        this.processQueue = function() {
+            if (this.queue.length > 0) {
+                var data = this.queue.splice(0, 1)[0];
+                var request = data[0];
+                var callback = data[1];
+                this.geocoder.geocode(request, callback);
+            } else {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+        }
+    },
+});
 
-var geocoderService = {
-    geocoder : new google.maps.Geocoder(),
-    queue : [],
-    DELAY: 2000,
-    timer: null,
-    geocode: function(request, callback) {
-        this.queue.push([request, callback]);
-        if (this.timer == null) {
-            this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
-        }
-    },
-    processQueue: function() {
-        if (this.queue.length > 0) {
-            var data = this.queue.splice(0, 1)[0];
-            var request = data[0];
-            var callback = data[1];
-            this.geocoder.geocode(request, callback);
-        } else {
-            clearInterval(this.timer);
-            this.timer = null;
-        }
-    },
-};
+var geocoderService = new services.geocoding.GeocoderService();
 
 var rawSavedTracksService = {
     base_url : "tracks.php",
@@ -243,8 +253,8 @@ var savedTracksService = {
         this.queue.push([request, callback]);
         if (this.timer == null) {
             this.processQueue();
+            this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
         }
-        this.timer = setInterval(this.processQueue.bind(this), this.DELAY);
     },
     processQueue: function() {
         if (this.queue.length > 0) {
