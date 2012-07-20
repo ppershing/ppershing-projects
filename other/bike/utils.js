@@ -60,3 +60,35 @@ utils = {
 utils.AssertException.prototype.toString = function () {
     return 'AssertException: ' + this.message;
 }
+
+utils.JsonRpc = function() {
+    this.call = function(url, callback) {
+        var request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200) {
+                    var response = null;
+                    var decode_ok = false;
+                    try {
+                        response = JSON.parse(request.responseText);
+                        decode_ok = true;
+                    } catch (err) {
+                        decode_ok = false;
+                    }
+
+                    if (decode_ok) {
+                        callback(response, "OK");
+                    } else {
+                        callback(null, "Request failed (invalid JSON)");
+                    }
+                } else {
+                    callback(null, "Request failed (http" + request.status + ")");
+                }
+            } else {
+                // pass
+            }
+        };
+        request.send(null);
+    }
+}

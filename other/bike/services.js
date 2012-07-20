@@ -13,35 +13,28 @@ Namespace('services.routing', {
         url += "&v=" + query.travelMode;
         url += "&format=geojson";
 
-        var request = new XMLHttpRequest();
-        request.open("GET", url, true);
-        request.onreadystatechange = function() {
-            if (request.readyState == 4) {
-                if (request.status == 200) {
-                    response = JSON.parse(request.responseText);
-                    var lat_lngs = []
-                    for (var i = 0; i < response.coordinates.length; i++) {
-                        lat_lngs.push(new
-                        google.maps.LatLng(response.coordinates[i][1],
-                        response.coordinates[i][0]));
-                    };
+        var request = new utils.JsonRpc();
+        request.call(url, function(response, was_ok) {
+            if (was_ok == "OK") {
+                var lat_lngs = []
+                for (var i = 0; i < response.coordinates.length; i++) {
+                    lat_lngs.push(new
+                    google.maps.LatLng(response.coordinates[i][1],
+                    response.coordinates[i][0]));
+                };
 
-                    result = {
-                        steps: [{ lat_lngs: lat_lngs}],
-                        distance: {
-                            value: response.properties.distance * 1000,
-                        }
-                    };
-                    callback(result, "OK");
-                } else {
-                    callback(null, "Request failed");
-                }
+                result = {
+                    steps: [{ lat_lngs: lat_lngs}],
+                    distance: {
+                        value: response.properties.distance * 1000,
+                    }
+                };
+                callback(result, "OK");
             } else {
-                // pass
+                callback(null, was_ok);
             }
-        };
-        request.send(null);
-    }
+        });
+    };
  },
 
  GmapsRouteService : function() {
@@ -220,27 +213,21 @@ var rawSavedTracksService = {
 
     getVisibleTracks: function(bounds, callback) {
 
-        var request = new XMLHttpRequest();
         var url = this.base_url;
         url += "?left=" + bounds.getSouthWest().lng();
         url += "&top=" + bounds.getNorthEast().lat();
         url += "&right=" + bounds.getNorthEast().lng();
         url += "&bottom=" + bounds.getSouthWest().lat();
-        request.open("GET", url, true);
-        request.onreadystatechange = function() {
-            if (request.readyState == 4) {
-                if (request.status == 200) {
-                    var response = JSON.parse(request.responseText);
-                    callback(response);
-                } else {
-                    console.log("Requesting tracks failed!");
-                    callback({});
-                }
+
+        var rpc = new utils.JsonRpc();
+        rpc.call(url, function(response, was_ok) {
+            if (was_ok == "OK") {
+                callback(response);
             } else {
-                // pass
+                console.log("Requesting tracks failed!");
+                callback({});
             }
-        };
-        request.send(null);
+        });
     }
 }
 
