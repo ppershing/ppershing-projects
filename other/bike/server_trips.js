@@ -3,21 +3,14 @@ var server_trips = {
     rootElement: ELEMENTS.serverTripsList,
 
     init: function() {
-        var request = new XMLHttpRequest()
-        request.open("GET", this.TRIP_FILE, true)
-        request.onreadystatechange = function() {
-            if (request.readyState == 4) {
-                if (request.status == 200) {
-                    var trips = JSON.parse(request.responseText);
-                    server_trips.refreshOnPage(trips);
-                } else {
-                    server_trips.refreshOnPage([]);
-                }
+        var rpc = new utils.JsonRpc();
+        rpc.call(this.TRIP_FILE, function(response, was_ok) {
+            if (was_ok == "OK") {
+                server_trips.refreshOnPage(response);
             } else {
-                // pass
+                server_trips.refreshOnPage([]);
             }
-        }
-        request.send(null);
+        });
     },
 
     refreshOnPage: function(trips) {

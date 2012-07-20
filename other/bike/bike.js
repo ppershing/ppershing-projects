@@ -836,21 +836,14 @@ function loadFromHistory() {
         if (!state.load_from.match(/[a-zA-Z0-9._]+/)) {
             throw "Security violation!"
         }
-        var request = new XMLHttpRequest()
-        request.open("GET", state.load_from, true)
-        request.onreadystatechange = function() {
-            if (request.readyState == 4) {
-                if (request.status == 200) {
-                    var state = JSON.parse(request.responseText);
-                    setCurrentState(state);
-                } else {
-                    alert('Could not load the trip!');
-                }
+        var rpc = new utils.JsonRpc();
+        rpc.call(state.load_from, function(response, was_ok) {
+            if (was_ok == "OK") {
+                setCurrentState(response);
             } else {
-                // pass
+                alert('Could not load the trip!');
             }
-        }
-        request.send(null);
+        });
     } else {
         // we have the state
         setCurrentState(state);
