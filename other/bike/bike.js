@@ -17,6 +17,8 @@ var elevations = [];
 var slopeToElevationIndex = [];
 
 var saved_tracks = {}; // we need associative array!
+var show_tracks = "none";
+
 var CONFIG = {
     MAP_SETTINGS : {
         zoom: 8,
@@ -64,7 +66,8 @@ var ELEMENTS = {
         "BIKING" : document.getElementById("ETA_mode_BIKING"),
         "HIKING" : document.getElementById("ETA_mode_HIKING"),
         "RUNNING" : document.getElementById("ETA_mode_RUNNING"),
-    }
+    },
+    showTracks : document.getElementById("show_tracks_img"),
 }
 
 function refreshDirections() {
@@ -165,14 +168,32 @@ function initializeUI() {
             ELEMENTS.EtaModes[mode].addEventListener("click",
                 function() {
                     for (tmp in ELEMENTS.EtaModes) {
-                        ELEMENTS.EtaModes[tmp].classList.remove('eta_mode_img_selected');
+                        ELEMENTS.EtaModes[tmp].classList.remove('button_like_selected');
                     };
-                    ELEMENTS.EtaModes[mode].classList.add('eta_mode_img_selected');
+                    ELEMENTS.EtaModes[mode].classList.add('button_like_selected');
                     eta_mode = mode;
                     updateInfo(elevations);
                 });
         }(key));
     }
+
+    ELEMENTS.showTracks.addEventListener("click",
+        function() {
+            if (show_tracks == "none") {
+                show_tracks = "all";
+            } else if (show_tracks == "all") {
+                show_tracks = "none";
+            } else {
+                show_tracks = "none";
+            }
+
+            if (show_tracks == "none") {
+                ELEMENTS.showTracks.classList.remove("button_like_selected");
+            } else {
+                ELEMENTS.showTracks.classList.add("button_like_selected");
+            }
+            refreshTracks();
+        });
 
     elevationChart = new google.visualization.AreaChart(ELEMENTS.elevationChart);
     google.visualization.events.addListener(elevationChart, 'onmouseover', elevationMouseOver);
@@ -192,16 +213,25 @@ function initializeUI() {
     ELEMENTS.defaultTravelMode.appendChild(select);
 }
 
+function clearTracks() {
+    for (key in saved_tracks) {
+        var trk = saved_tracks[key];
+        for (var i = 0; i < trk.polylines.length; i++) {
+            trk.polylines[i].setMap(null);
+        }
+        trk.polylines = [];
+    }
+}
+
 function refreshTracks() {
+    if (show_tracks == "none") {
+        clearTracks();
+        return;
+    }
+
     savedTracksService.getVisibleTracks(map.getBounds(),
         function (response) {
-            for (key in saved_tracks) {
-                var trk = saved_tracks[key];
-                for (var i = 0; i < trk.polylines.length; i++) {
-                    trk.polylines[i].setMap(null);
-                }
-                trk.polylines = [];
-            }
+            clearTracks();
 
             for (key in response) {
                 var rsp = response[key];
@@ -698,14 +728,6 @@ function updateInfo(elevations) {
     var hours = Math.floor(time);
     var mins = Math.round(60 * (time - hours));
     ELEMENTS.estimatedTime.textContent = hours + "h " + mins + "m";
-}
-
-
-
-function button(a, b, c) {
-    this.name = a;
-    this.id = c;
-    this.action = b
 }
 
 function getCurrentState() {

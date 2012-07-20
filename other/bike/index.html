@@ -2,7 +2,12 @@
     <link rel="stylesheet" href="css/style.css" type="text/css">
     <body>
         <div>
-          Permalink: <input type="text" id="permalink" size="100"/>
+            <img id="show_tracks_img"
+                 class="show_tracks_img button_like"
+                 src="images/show-tracks.png"/>
+            <span class="permalink">
+                Permalink: <input type="text" id="permalink" size="100"/>
+            </span>
           <br/>
         </div>
 
@@ -17,9 +22,15 @@
                 estimated time:<span id="estimated_time"></span>
                 (
                 <span id="ETA_mode">
-                    <img id = "ETA_mode_BIKING" class="eta_mode_img eta_mode_img_selected" src="images/biking.png">
-                    <img id = "ETA_mode_HIKING" class="eta_mode_img" src="images/hiking.png">
-                    <img id = "ETA_mode_RUNNING" class="eta_mode_img" src="images/running.png">
+                    <img id="ETA_mode_BIKING"
+                         class="eta_mode_img button_like button_like_selected"
+                         src="images/biking.png"/>
+                    <img id = "ETA_mode_HIKING"
+                         class="eta_mode_img button_like"
+                         src="images/hiking.png"/>
+                    <img id = "ETA_mode_RUNNING"
+                        class="eta_mode_img button_like"
+                        src="images/running.png"/>
                 </span>
                 )
             </div>

@@ -1,15 +1,32 @@
 .eta_mode_img {
-    height: 10px;
-    padding: 2px;
+    height: 14px;
+    margin-top: 4px;
+}
+
+.button_like {
     background: #EEEEEE;
     border: 1px solid gray;
 }
 
-.eta_mode_img:hover {
+.button_like:hover {
     border: 1px solid #555555;
 }
 
-.eta_mode_img_selected {
+.button_like_selected {
     background: #EEEEAA;
     border: 1px solid black;
+}
+
+.permalink {
+    float: right;
+}
+
+.show_tracks_img {
+    height: 20px;
+    padding: 2px;
+}
+
+
+.show_tracks_img_selected {
+    background: #DDDDDD;
 }
