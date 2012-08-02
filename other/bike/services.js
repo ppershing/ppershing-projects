@@ -211,13 +211,15 @@ var geocoderService = new services.geocoding.GeocoderService();
 var rawSavedTracksService = {
     base_url : "tracks.php",
 
-    getVisibleTracks: function(bounds, callback) {
+    getVisibleTracks: function(query, callback) {
 
         var url = this.base_url;
-        url += "?left=" + bounds.getSouthWest().lng();
-        url += "&top=" + bounds.getNorthEast().lat();
-        url += "&right=" + bounds.getNorthEast().lng();
-        url += "&bottom=" + bounds.getSouthWest().lat();
+        url += "?query=get_visible_segments";
+        url += "&west=" + query.bounds.getSouthWest().lng();
+        url += "&north=" + query.bounds.getNorthEast().lat();
+        url += "&east=" + query.bounds.getNorthEast().lng();
+        url += "&south=" + query.bounds.getSouthWest().lat();
+        url += "&tracks=" + query.tracks;
 
         var rpc = new utils.JsonRpc();
         rpc.call(url, function(response, was_ok) {

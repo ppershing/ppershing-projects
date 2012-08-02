@@ -229,7 +229,10 @@ function refreshTracks() {
         return;
     }
 
-    savedTracksService.getVisibleTracks(map.getBounds(),
+    savedTracksService.getVisibleTracks(
+        { bounds:map.getBounds(),
+          tracks: show_tracks,
+        },
         function (response) {
             clearTracks();
 
