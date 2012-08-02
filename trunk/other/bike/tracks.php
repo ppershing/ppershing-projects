@@ -1,6 +1,6 @@
 <?php
 
-function distance($lat1, $lng1, $lat2, $lng2) {
+function distance_km($lat1, $lng1, $lat2, $lng2) {
   $ra = M_PI/180; 
   $b = $lat1 * $ra;
   $c = $lat2 * $ra;
@@ -9,26 +9,56 @@ function distance($lat1, $lng1, $lat2, $lng2) {
 
   $tmp = sin($d/2) * sin($d/2) + cos($b) * cos($c) * sin($g/2)*sin($g/2);
   $f = 2 * asin(sqrt($tmp));
-  return $f * 6378.137 * 1000; 
+  return $f * 6378.137; 
 }
+
+$request = (object) array('query' => $_GET['query'],
+                          'west' => $_GET['west'],
+                          'east' => $_GET['east'],
+                          'north' => $_GET['north'],
+                          'south' => $_GET['south'],
+                          'tracks' => $_GET['tracks']);
+
 
 error_reporting(E_ALL);
 try {
     $db = new PDO('sqlite:trips.db');
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $stmt = $db->prepare('SELECT tracks.id, tracks.date, tracks.type,
+    $where_parts = array(
+        'latitude > ?',
+        'latitude < ?',
+        'longitude > ?',
+        'longitude < ?',
+        'type != "cesta"',
+        'low_res = 1',
+    );
+
+    $MARGIN = 0.3; // 30% greater bounding-box
+
+    $params = array(
+        $request->south * (1 + $MARGIN) - $request->north * $MARGIN,
+        $request->north * (1 + $MARGIN) - $request->south * $MARGIN,
+        $request->west * (1 + $MARGIN) - $request->east * $MARGIN,
+        $request->east * (1 + $MARGIN) - $request->west * $MARGIN,
+    );
+
+    if ($request->tracks != "all") {
+        $where_parts[] = "tracks.id = ?";
+        $params[] = $request->tracks;
+    }
+
+    $where = implode(' AND ', $where_parts);
+
+    $stmt = $db->prepare("SELECT tracks.id, tracks.date, tracks.type,
         tracks.name, segments.segment_id, sequence_no, latitude, longitude FROM 
         tracks JOIN segments on tracks.id = segments.track_id 
         JOIN points ON points.segment_id = segments.segment_id
-        WHERE latitude > ? AND latitude < ?
-        AND longitude > ? AND longitude < ?
-        AND type != "cesta"
-        AND low_res = 1
+        WHERE $where
        ORDER BY tracks.date ASC, segments.segment_id, sequence_no ASC
-        ');
+        ");
     $stmt->execute(
-        array($_GET['bottom'], $_GET['top'], $_GET['left'], $_GET['right'])
+        $params
         );
 
     $tracks = array();
@@ -63,10 +93,8 @@ try {
     unset($trk);
     unset($segment);
 
-    $max_distance = distance($_GET["left"], $_GET["top"],
-                             $_GET["right"], $_GET["bottom"])
-                    / 1000.0;
-
+    $max_distance = distance_km($request->west, $request->north,
+                             $request->east, $request->south) / 500.0;
     foreach ($tracks as &$trk) {
         $trk['seg'] = array();
         foreach ($trk['segments'] as $trkseg) {
@@ -74,7 +102,7 @@ try {
             $lastpt = $trkseg[0];
             $selection = array($trkseg[0]);
             foreach ($trkseg as $trkpt) {
-                $distance += distance($lastpt["lat"], $lastpt["lon"],
+                $distance += distance_km($lastpt["lat"], $lastpt["lon"],
                                       $trkpt["lat"], $trkpt["lon"]);
                 if ($distance >= $max_distance) {
                     $selection[] = $trkpt;
