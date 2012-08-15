@@ -288,6 +288,7 @@ function refreshTracks() {
 
                     var saved_track_colors = {
                         "bike" : "#66CCFF",
+                        "bike-to-work" : "#66CCFF",
                         "beh" : "#FF3333",
                         "vylet" : "#99FF33",
                         "prechadzka" : "#66FF99",
@@ -299,7 +300,7 @@ function refreshTracks() {
                         strokeColor: saved_track_colors[rsp.type] !=
                         undefined ? saved_track_colors[rsp.type] : 
                         saved_track_colors["unknown"],
-                        strokeOpacity: 0.7,
+                        strokeOpacity: 0.5,
                         strokeWeight: 4,
                         map: map
                     };
@@ -322,7 +323,7 @@ function refreshTracks() {
                                 infoWindow.close();
                                 for (var i = 0; i < polylines.length; i++)
                                 {
-                                    polylines[i].set('strokeOpacity', 0.7);
+                                    polylines[i].set('strokeOpacity', 0.5);
                                     polylines[i].set('strokeWeight', 4);
                                 }
                             });
