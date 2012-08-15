@@ -258,11 +258,17 @@ function refreshTracks() {
             for (key in response) {
                 var rsp = response[key];
                 if (saved_tracks[key] == undefined) {
+                    infowindow_html = rsp.type + " " + rsp.date + 
+                                " : " + rsp.name;
+                    if (rsp.photo_album) {
+                        infowindow_html += "<br/><center><a target='_blank' href='" + rsp.photo_album +
+                        "'>Photos</a></center>";
+
+                    }
                     saved_tracks[key] = {
                         polylines: [],
                         infoWindow: new InfoBubble(
-                            { content: rsp.type + " " + rsp.date + 
-                                " : " + rsp.name,
+                            { content: infowindow_html ,
                               disableAutoPan: true,
                               hideCloseButton: true,
                               disableAnimation: true,
