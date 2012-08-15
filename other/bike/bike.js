@@ -356,11 +356,27 @@ function elevationMouseOut(e) {
 
 function slopeMouseOver(e) {
     var selection = [];
+    var latlngs = []
+
     var start = slopeToElevationIndex[e.row];
     var end = slopeToElevationIndex[e.row + 1]
+
     for (var x = start; x < end; x++) {
         selection.push({'row': x, 'column': 1});
+        latlngs.push(elevations[x].location);
     }
+    if (slopePolyline) {
+        slopePolyline.setMap(null);
+    }
+
+    var a = {
+        path: latlngs,
+        strokeColor: "#CC0000",
+        strokeOpacity: 1,
+        strokeWeight: 3,
+        map: map,
+    }
+    slopePolyline = new google.maps.Polyline(a);
     elevationChart.setSelection(selection);
 }
 
@@ -373,6 +389,10 @@ function elevationClick() {
 
 function slopeMouseOut(e) {
     elevationChart.setSelection([])
+    if (slopePolyline) {
+        slopePolyline.setMap(null);
+        slopePolyline = null;
+    }
 }
 
 function directionsLoaded(marker_index, result, loaded_ok) {
