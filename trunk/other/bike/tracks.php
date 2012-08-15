@@ -22,8 +22,18 @@ $request = (object) array('query' => $_GET['query'],
 
 error_reporting(E_ALL);
 try {
-    $db = new PDO('sqlite:trips.db');
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $max_distance = distance_km($request->west, $request->north,
+                             $request->east, $request->south) / 250.0;
+    $expected_trkpoint_distance = 30 /*km/h*/ / (60*15 /* 4s interval */);
+    $resolution_level = 0;
+    $SEQ_RES = 1;
+    while ($expected_trkpoint_distance < $max_distance / 2 &&
+           $resolution_level < 6) {
+        $expected_trkpoint_distance *= 2;
+        $resolution_level++;
+        $SEQ_RES *= 2;
+    }
 
     $where_parts = array(
         'latitude > ?',
@@ -31,7 +41,7 @@ try {
         'longitude > ?',
         'longitude < ?',
         'type != "cesta"',
-        'low_res = 1',
+        'resolution_level >= ?',
     );
 
     $MARGIN = 0.3; // 30% greater bounding-box
@@ -41,6 +51,7 @@ try {
         $request->north * (1 + $MARGIN) - $request->south * $MARGIN,
         $request->west * (1 + $MARGIN) - $request->east * $MARGIN,
         $request->east * (1 + $MARGIN) - $request->west * $MARGIN,
+        $resolution_level,
     );
 
     if ($request->tracks != "all") {
@@ -48,74 +59,100 @@ try {
         $params[] = $request->tracks;
     }
 
-    $where = implode(' AND ', $where_parts);
+    function fetch_tracks_from_db($sql_where_parts, $sql_params, $SEQ_RES) {
+        $where = implode(' AND ', $sql_where_parts);
 
-    $stmt = $db->prepare("SELECT tracks.id, tracks.date, tracks.type,
-        tracks.name, segments.segment_id, sequence_no, latitude, longitude FROM 
-        tracks JOIN segments on tracks.id = segments.track_id 
-        JOIN points ON points.segment_id = segments.segment_id
-        WHERE $where
-       ORDER BY tracks.date ASC, segments.segment_id, sequence_no ASC
-        ");
-    $stmt->execute(
-        $params
-        );
+        $db = new PDO('sqlite:trips.db');
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $tracks = array();
-    $prev_seg = -1;
-    $prev_seq = -1;
-
-    $SEQ_RES=15; // keep in sync with python
-
-    while ($row = $stmt->fetch()) {
-        if (!array_key_exists($row['id'], $tracks)) {
-            $tracks[$row['id']] = array(
-                'date' => $row['date'],
-                'type' => $row['type'],
-                'name' => $row['name'],
-                'segments' => array()
+        $stmt = $db->prepare("SELECT tracks.id, tracks.date, tracks.type,
+            tracks.name, tracks.full_name, segments.segment_id, sequence_no, latitude, longitude FROM 
+            tracks JOIN segments on tracks.id = segments.track_id 
+            JOIN points ON points.segment_id = segments.segment_id
+            WHERE $where
+           ORDER BY tracks.date ASC, segments.segment_id, sequence_no ASC
+            ");
+        $stmt->execute(
+            $sql_params
             );
-        }
-        unset($trk);
-        $trk = &$tracks[$row['id']];
-        if ($prev_seg != $row['segment_id'] ||
-            $prev_seq + $SEQ_RES != $row['sequence_no']) {
-            unset($segment);
-            $segment = array();
-            $trk['segments'][] = &$segment;
-        }
 
-        $segment[] = array('lat' => $row['latitude'], 'lng' => $row['longitude']);
+        $tracks = array();
+        $prev_seg = -1;
+        $prev_seq = -1;
 
-        $prev_seg = $row['segment_id'];
-        $prev_seq = $row['sequence_no'];
-    }
-    unset($trk);
-    unset($segment);
 
-    $max_distance = distance_km($request->west, $request->north,
-                             $request->east, $request->south) / 500.0;
-    foreach ($tracks as &$trk) {
-        $trk['seg'] = array();
-        foreach ($trk['segments'] as $trkseg) {
-            $distance = 0;
-            $lastpt = $trkseg[0];
-            $selection = array($trkseg[0]);
-            foreach ($trkseg as $trkpt) {
-                $distance += distance_km($lastpt["lat"], $lastpt["lon"],
-                                      $trkpt["lat"], $trkpt["lon"]);
-                if ($distance >= $max_distance) {
-                    $selection[] = $trkpt;
-                    $distance -= $max_distance;
-                }
-
-                $lastpt = $trkpt;
+        while ($row = $stmt->fetch()) {
+            if (!array_key_exists($row['id'], $tracks)) {
+                $tracks[$row['id']] = array(
+                    'date' => $row['date'],
+                    'type' => $row['type'],
+                    'name' => $row['name'],
+                    'full_name' => $row['full_name'],
+                    'segments' => array()
+                );
             }
-            $selection[] = $trkseg[count($trkseg)-1];
-            $trk['seg'][] = $selection;
+            unset($trk);
+            $trk = &$tracks[$row['id']];
+            if ($prev_seg != $row['segment_id'] ||
+                $prev_seq + $SEQ_RES != $row['sequence_no']) {
+                unset($segment);
+                $segment = array();
+                $trk['segments'][] = &$segment;
+            }
+
+            $segment[] = array('lat' => $row['latitude'], 'lng' => $row['longitude']);
+
+            $prev_seg = $row['segment_id'];
+            $prev_seq = $row['sequence_no'];
         }
-        unset($trk['segments']);
+
+        return $tracks;
+    };
+
+    function tracks_add_photo_albums(&$tracks) {
+        foreach ($tracks as &$trk) {
+            $year = substr($trk['date'], 0, 4);
+            $full_name = substr($trk['full_name'],0,-4);
+            $ALBUMS_LOCAL_PATH="/home/ppershing/public_html/data/foto/gal";
+            //echo "$ALBUMS_LOCAL_PATH/$year/$full_name<br/>";
+            if (is_dir("$ALBUMS_LOCAL_PATH/$year/$full_name")) {
+                $ALBUMS_URL="http://people.ksp.sk/~ppershing/foto/index.php?spgmGal=";
+                $trk['photo_album'] = $ALBUMS_URL."$year/$full_name";
+            } else {
+                $trk['photo_album'] = null;
+            }
+        }
     }
+
+    function tracks_compact_segments(&$tracks, $resolution_level, $max_distance) {
+        foreach ($tracks as &$trk) {
+            $trk['seg'] = array();
+            foreach ($trk['segments'] as $trkseg) {
+                $distance = 0;
+                $lastpt = $trkseg[0];
+                $selection = array($trkseg[0]);
+                foreach ($trkseg as $trkpt) {
+                    $distance += distance_km($lastpt["lat"], $lastpt["lon"],
+                                          $trkpt["lat"], $trkpt["lon"]);
+                    if ($resolution_level == 0 || $distance >= $max_distance) {
+                        $selection[] = $trkpt;
+                        $distance -= $max_distance;
+                    }
+
+                    $lastpt = $trkpt;
+                }
+                $selection[] = $trkseg[count($trkseg)-1];
+                $trk['seg'][] = $selection;
+            }
+            unset($trk['segments']);
+        }
+    }
+
+    $tracks = fetch_tracks_from_db($where_parts, $params, $SEQ_RES);
+
+    tracks_add_photo_albums($tracks);
+    tracks_compact_segments($tracks, $resolution_level, $max_distance);
+
     echo json_encode($tracks);
 } catch(PDOException $e) {
     echo $e;
