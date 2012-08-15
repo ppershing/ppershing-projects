@@ -10,6 +10,7 @@ var map;
 var mousemarker = null;
 var elevationChart = null;
 var slopeChart = null;
+var slopePolyline = null;
 
 var sections = [];
 
@@ -108,6 +109,7 @@ function initializeMap() {
     var mapTypeIds = [];
     mapTypeIds.push("OSM");
     mapTypeIds.push("OCM");
+    //mapTypeIds.push("SwissTopo");
     for(var type in google.maps.MapTypeId) {
         mapTypeIds.push(google.maps.MapTypeId[type]);
     }
@@ -138,6 +140,23 @@ function initializeMap() {
         name: "OpenCycleMap",
         maxZoom: 18
     }));
+    /*
+    map.mapTypes.set("SwissTopo", new google.maps.ImageMapType({
+        swissgeoMKey: new swissgeoMKey(),
+        getTileUrl: function(ll, z) {
+                mcn=parseInt((Math.random()*10000)%4)+1;
+                wmscUrl="http://mc"+mcn+".swissgeo.ch/wms-c/"+this.swissgeoMKey.key+"/topomaps/1.0.0/ch/" + z + "/" + ll.x + "/" + ll.y + ".png";
+                return wmscUrl;
+        },
+        tileSize: new google.maps.Size(256, 256),
+        isPng: true,
+        minZoom: 9,
+        maxZoom: 15,
+        opacity:0.6,
+        name: "Swisstopo",
+        alt: "topo ch"
+     }));
+     */
 }
 
 function initializeUI() {
