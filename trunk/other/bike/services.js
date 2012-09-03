@@ -1,7 +1,7 @@
 Namespace('services.routing', {
  OSMRouteDirectionsService : function() {
     this.transport_url = "transport.php?url=";
-    this.base_url = "http://www.yournavigation.org/api/1.0/gosmore.php"
+    this.base_url = "http://www.yournavigation.org/api/dev/gosmore.php"
 
     this.route = function(query, callback) {
         var url = this.transport_url;
@@ -17,7 +17,7 @@ Namespace('services.routing', {
         request.call(url, function(response, was_ok) {
             if (was_ok == "OK") {
                 var lat_lngs = []
-                for (var i = 0; i < response.coordinates.length; i++) {
+                for (var i = 1; i < response.coordinates.length; i++) {
                     lat_lngs.push(new
                     google.maps.LatLng(response.coordinates[i][1],
                     response.coordinates[i][0]));
